@@ -54,7 +54,11 @@ app.use((req, res, next) => {
   let sessionId = req.cookies[SESSION_COOKIE];
   if (!sessionId) {
     sessionId = crypto.randomUUID();
-    res.cookie(SESSION_COOKIE, sessionId, { httpOnly: true, sameSite: "lax" });
+    res.cookie(SESSION_COOKIE, sessionId, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    });
   }
   req.sessionId = sessionId;
   next();
