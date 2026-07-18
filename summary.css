@@ -1,0 +1,106 @@
+html, body {
+   font-family: Arial, sans-serif;
+   background-color: #f0ffff;
+   margin: 0;
+   padding: 0;
+   color: #000000;
+}
+
+h1 {
+   text-align: center;
+   margin-top: 0;
+   padding: 30px;
+   color: #234461;
+   background-color: #e0ffff;
+   border-style: inset;
+}
+
+.summary-wrapper {
+   max-width: 820px;
+   margin: 40px auto;
+   padding: 0 20px 40px;
+}
+
+.downloadRow {
+   text-align: center;
+   margin-bottom: 20px;
+}
+
+#downloadPdfBtn {
+   display: inline-block;
+   padding: 10px 18px;
+   border-radius: 5px;
+   font-size: 15px;
+   font-weight: bold;
+   background-color: #234461;
+   color: #ffffff;
+   text-decoration: none;
+   transition: background-color 0.15s ease;
+}
+
+#downloadPdfBtn:hover {
+   background-color: #2f5d86;
+}
+
+.entry-card {
+   padding: 15px 20px 20px;
+   border-radius: 8px;
+   border: 1px solid #ccc;
+   background-color: #e0ffff;
+   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+   margin-bottom: 20px;
+}
+
+.entry-header {
+   border-bottom: 2px solid #234461;
+   padding-bottom: 6px;
+   margin-bottom: 4px;
+}
+
+.entry-header h3 {
+   margin: 0;
+   color: #234461;
+   font-size: 18px;
+}
+
+.sub-card {
+   border: 1px solid #ccc;
+   border-radius: 6px;
+   padding: 10px 14px 14px;
+   margin-top: 12px;
+   background-color: #fffacd;
+}
+
+.sub-card h4 {
+   margin: 0 0 8px;
+   color: #234461;
+   font-size: 15px;
+}
+
+.info-grid {
+   display: flex;
+   flex-wrap: wrap;
+   gap: 10px;
+}
+
+.info-field {
+   display: flex;
+   flex-direction: column;
+   gap: 2px;
+   min-width: 160px;
+   padding: 8px 12px;
+   border-radius: 6px;
+   border: 1px solid #ccc;
+   background-color: #ffffff;
+}
+
+.info-label {
+   font-weight: bold;
+   font-size: 12px;
+   color: #234461;
+}
+
+.info-value {
+   font-size: 14px;
+   word-break: break-word;
+}

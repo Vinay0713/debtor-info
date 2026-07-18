@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Assets</title>
+  <link rel="stylesheet" type="text/css" href="nav.css">
+  <link rel="stylesheet" type="text/css" href="assets.css">
+</head>
+<body>
+  <div id="navPlaceholder"></div>
+
+  <h1>Assets</h1>
+
+  <div id="pageContent" class="assets-info">
+
+  <div class="button-group">
+    <button id="addPropertyBtn">Add Property</button>
+    <button id="addVehicleBtn">Add Vehicle</button>
+    <button id="addPolicyBtn">Add Policy</button>
+    <button id="addSecurityBtn">Add Security</button>
+    <button id="addOtherAssetBtn">Add Other Asset</button>
+  </div>
+
+  <!-- Property -->
+  <template id="propertyTemplate">
+  <div class="entry-card typed-entry-card">
+    <div class="entry-header">
+      <h3>Property</h3>
+      <button type="button" class="removeEntryBtn" aria-label="Remove entry">&times;</button>
+    </div>
+    <div class="entry-body">
+      <div class="entry-fields">
+        <label>Property Type:
+          <select class="type-select" name="propertyType">
+            <option value="House">House</option>
+            <option value="Mobile Home">Mobile Home</option>
+            <option value="Trailer">Trailer</option>
+          </select>
+        </label>
+
+        <div class="type-group" data-type="House">
+          <label>Address:
+            <input type="text" name="houseAddress" />
+          </label>
+          <label>Number of People on Title:
+            <input type="number" name="numberOnTitle" min="0" />
+          </label>
+          <label>Property Value:
+            <input type="text" name="propertyValue" />
+          </label>
+          <label>Mortgage:
+            <input type="text" name="houseMortgage" />
+          </label>
+          <label>Residence:
+            <select name="residenceType">
+              <option value="Primary">Primary</option>
+              <option value="Secondary">Secondary</option>
+            </select>
+          </label>
+          <label>Mortgage Provider Name:
+            <input type="text" name="houseMortgageProvider" />
+          </label>
+        </div>
+
+        <div class="type-group" data-type="Mobile Home" style="display:none;">
+          <label>Name of Mobile Home:
+            <input type="text" name="mobileHomeName" />
+          </label>
+          <label>Value:
+            <input type="text" name="mobileHomeValue" />
+          </label>
+          <label>Mortgage:
+            <input type="text" name="mobileHomeMortgage" />
+          </label>
+          <label>Mortgage Provider Name:
+            <input type="text" name="mobileHomeMortgageProvider" />
+          </label>
+          <label>Supporting Doc for Value:
+            <input type="text" name="mobileHomeSupportingDoc" />
+          </label>
+        </div>
+
+        <div class="type-group" data-type="Trailer" style="display:none;">
+          <label>Name of Trailer:
+            <input type="text" name="trailerName" />
+          </label>
+          <label>Value:
+            <input type="text" name="trailerValue" />
+          </label>
+          <label>Mortgage:
+            <input type="text" name="trailerMortgage" />
+          </label>
+          <label>Mortgage Provider Name:
+            <input type="text" name="trailerMortgageProvider" />
+          </label>
+          <label>Supporting Doc for Value:
+            <input type="text" name="trailerSupportingDoc" />
+          </label>
+        </div>
+      </div>
+
+      <div class="entry-note">
+        <h4>Notes</h4>
+        <ol class="note-list" data-note="House">
+          <li>Value doc preference: Purview &gt; Realtor Opinion &gt; Honestdoor &gt; Property Assessment.</li>
+          <li>For property assessments, take prior approval from the concerned person.</li>
+          <li>If title is not clear on Purview, or using Honestdoor and Realtor Opinion, ask for the title doc.</li>
+        </ol>
+        <ol class="note-list" data-note="Mobile Home" style="display:none;">
+          <li>Note goes here.</li>
+        </ol>
+        <ol class="note-list" data-note="Trailer" style="display:none;">
+          <li>Note goes here.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+  </template>
+  <h2>Properties</h2>
+  <div id="propertyContainer" class="entry-list"></div>
+
+  <!-- Vehicle -->
+  <template id="vehicleTemplate">
+  <div class="entry-card typed-entry-card">
+    <div class="entry-header">
+      <h3>Vehicle</h3>
+      <button type="button" class="removeEntryBtn" aria-label="Remove entry">&times;</button>
+    </div>
+    <div class="entry-body">
+      <div class="entry-fields">
+        <label>Vehicle Type:
+          <select class="type-select" name="vehicleType">
+            <optgroup label="Vehicle">
+              <option value="Car">Car</option>
+              <option value="Motorcycle">Motorcycle</option>
+            </optgroup>
+            <optgroup label="Recreational Vehicle">
+              <option value="Trailer">Trailer</option>
+              <option value="Camper">Camper</option>
+              <option value="Boat">Boat</option>
+              <option value="Snowmobile">Snowmobile</option>
+              <option value="Other">Other</option>
+            </optgroup>
+          </select>
+        </label>
+        <label>Year:
+          <input type="text" name="vehicleYear" class="mirror-source" data-mirror="year" />
+        </label>
+        <label>Make:
+          <input type="text" name="vehicleMake" class="mirror-source" data-mirror="make" />
+        </label>
+        <label>Model:
+          <input type="text" name="vehicleModel" class="mirror-source" data-mirror="model" />
+        </label>
+        <label>VIN:
+          <input type="text" name="vehicleVIN" class="mirror-source" data-mirror="vin" />
+        </label>
+        <label>Mileage:
+          <input type="text" name="vehicleMileage" class="mirror-source" data-mirror="mileage" />
+        </label>
+        <label>Creditor Name (if leased or loaned):
+          <input type="text" name="vehicleCreditorName" />
+        </label>
+        <label>Vehicle Value:
+          <input type="text" name="vehicleValue" />
+        </label>
+        <label>Loan Value:
+          <input type="text" name="vehicleLoanValue" />
+        </label>
+      </div>
+
+      <div class="entry-note basic-card">
+        <h4>At a Glance</h4>
+        <p><strong>Year:</strong> <span data-mirror-target="year"></span></p>
+        <p><strong>Make:</strong> <span data-mirror-target="make"></span></p>
+        <p><strong>Model:</strong> <span data-mirror-target="model"></span></p>
+        <p><strong>VIN:</strong> <span data-mirror-target="vin"></span></p>
+        <p><strong>Mileage:</strong> <span data-mirror-target="mileage"></span></p>
+      </div>
+    </div>
+  </div>
+  </template>
+  <h2>Vehicles</h2>
+  <div id="vehicleContainer" class="entry-list"></div>
+
+  <!-- Policies -->
+  <template id="policyTemplate">
+  <div class="entry-card typed-entry-card">
+    <div class="entry-header">
+      <h3>Policy</h3>
+      <button type="button" class="removeEntryBtn" aria-label="Remove entry">&times;</button>
+    </div>
+    <div class="entry-fields">
+      <label>Policy Type:
+        <select class="type-select" name="policyType">
+          <option value="RRSP">RRSP</option>
+          <option value="DPSP">DPSP</option>
+          <option value="RESP">RESP</option>
+          <option value="Life Insurance">Life Insurance</option>
+          <option value="Other">Other</option>
+        </select>
+      </label>
+
+      <div class="type-group" data-type="RRSP">
+        <label>Policy Provider Name:
+          <input type="text" name="rrspProviderName" />
+        </label>
+        <label>Total Market Value:
+          <input type="text" name="rrspTotalMarketValue" />
+        </label>
+        <label>Last 12 Month Contributions:
+          <input type="text" name="rrspLast12MonthContributions" />
+        </label>
+      </div>
+
+      <div class="type-group" data-type="DPSP" style="display:none;">
+        <label>Policy Provider Name:
+          <input type="text" name="dpspProviderName" />
+        </label>
+        <label>Total Market Value:
+          <input type="text" name="dpspTotalMarketValue" />
+        </label>
+        <label>Last 12 Month Contributions:
+          <input type="text" name="dpspLast12MonthContributions" />
+        </label>
+      </div>
+
+      <div class="type-group" data-type="RESP" style="display:none;">
+        <label>Policy Provider Name:
+          <input type="text" name="respProviderName" />
+        </label>
+        <label>Total Market Value:
+          <input type="text" name="respTotalMarketValue" />
+        </label>
+      </div>
+
+      <div class="type-group" data-type="Life Insurance" style="display:none;">
+        <label>Policy Provider Name:
+          <input type="text" name="lifeInsuranceProviderName" />
+        </label>
+        <label>Value:
+          <input type="text" name="lifeInsuranceValue" />
+        </label>
+        <label>Cash Surrender Value:
+          <input type="text" name="lifeInsuranceCashSurrenderValue" />
+        </label>
+      </div>
+
+      <div class="type-group" data-type="Other" style="display:none;">
+        <label>Policy Name:
+          <input type="text" name="otherPolicyName" />
+        </label>
+        <label>Policy Provider Name:
+          <input type="text" name="otherPolicyProviderName" />
+        </label>
+        <label>Total Market Value:
+          <input type="text" name="otherPolicyTotalMarketValue" />
+        </label>
+      </div>
+    </div>
+  </div>
+  </template>
+  <h2>Policies</h2>
+  <div class="policies-layout">
+    <div id="policyContainer" class="entry-list"></div>
+    <aside class="section-note">
+      <h4>Notes</h4>
+      <ol>
+        <li>Don't take RRSP contributions for 12 months in Alberta.</li>
+        <li>Take 60% of total market value in RESP as equity.</li>
+      </ol>
+    </aside>
+  </div>
+
+  <!-- Securities -->
+  <template id="securityTemplate">
+  <div class="entry-card typed-entry-card">
+    <div class="entry-header">
+      <h3>Security</h3>
+      <button type="button" class="removeEntryBtn" aria-label="Remove entry">&times;</button>
+    </div>
+    <div class="entry-fields">
+      <label>Security Type:
+        <select class="type-select" name="securityType">
+          <option value="Mutual Fund">Mutual Fund</option>
+          <option value="Bonds">Bonds</option>
+          <option value="Crypto">Crypto</option>
+          <option value="Other">Other</option>
+        </select>
+      </label>
+      <label>Issuer Name:
+        <input type="text" name="securityIssuerName" />
+      </label>
+      <label>Total Market Value:
+        <input type="text" name="securityTotalMarketValue" />
+      </label>
+    </div>
+  </div>
+  </template>
+  <h2>Securities</h2>
+  <div id="securityContainer" class="entry-list"></div>
+
+  <!-- Other Assets -->
+  <template id="otherAssetTemplate">
+  <div class="entry-card">
+    <div class="entry-header">
+      <h3>Other Asset</h3>
+      <button type="button" class="removeEntryBtn" aria-label="Remove entry">&times;</button>
+    </div>
+    <label>Description:
+      <input type="text" name="otherAssetDescription" />
+    </label>
+    <label>Value:
+      <input type="text" name="otherAssetValue" />
+    </label>
+    <label>Loan Value:
+      <input type="text" name="otherAssetLoanValue" />
+    </label>
+    <label>Creditor Name:
+      <input type="text" name="otherAssetCreditorName" />
+    </label>
+  </div>
+  </template>
+  <h2>Other Assets</h2>
+  <div id="otherAssetContainer" class="entry-list"></div>
+
+  <!-- Bankruptcy Equity (only shown when employment info lists a Corporation/Incorporated self-employed entry) -->
+  <div id="bankruptcyEquitySection" class="entry-card" style="display:none;">
+    <div class="entry-header">
+      <h3>Bankruptcy Equity (Assets)</h3>
+    </div>
+    <label>Asset Description:
+      <input type="text" id="bankruptcyEquityAssetDescription" name="bankruptcyEquityAssetDescription" />
+    </label>
+    <label>Assets Value:
+      <input type="text" id="bankruptcyEquityAssetsValue" name="bankruptcyEquityAssetsValue" />
+    </label>
+  </div>
+
+  <div class="submitRow">
+    <button type="button" id="submitAssetsBtn">Submit Assets Info</button>
+    <span id="submitStatus"></span>
+  </div>
+
+  </div>
+
+  <script src="./nav.js"></script>
+  <script src="./gate.js"></script>
+  <script src="./assets.js"></script>
+</body>
+</html>

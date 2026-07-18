@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Income Information</title>
+  <link rel="stylesheet" type="text/css" href="nav.css">
+  <link rel="stylesheet" type="text/css" href="employment.css">
+</head>
+<body>
+  <div id="navPlaceholder"></div>
+
+  <h1>Income Information</h1>
+  <div id="pageContent" class="income-info">
+  <div class="button-group">
+  <button id="employedBtn">Add Employment Info</button>
+  <button id="unemployedBtn">Add Unemployment Info</button>
+  <button id="retiredBtn">Add Retired Info</button>
+  <button id="disabledBtn">Add Disabled Info</button>
+  <button id="selfEmployedBtn">Add Self-Employed Info</button>
+  </div>
+
+  <template id="employmentTemplate">
+  <div class="entry-card">
+    <div class="entry-header">
+      <h3>Employment Info</h3>
+      <button type="button" class="removeEntryBtn" aria-label="Remove entry">&times;</button>
+    </div>
+    <label>Employer Name:
+      <input type="text" name="employerName" />
+    </label>
+
+    <label>Job Title:
+      <input type="text" name="jobTitle" />
+    </label>
+
+    <label>Date of joining:
+      <input type="date" name="dateOfJoining" />
+    </label>
+  </div>
+   </template>
+    <div id="employmentContainer"></div>
+
+  <template id="unemploymentTemplate">
+  <div class="entry-card">
+    <div class="entry-header">
+      <h3>Unemployment Info</h3>
+      <button type="button" class="removeEntryBtn" aria-label="Remove entry">&times;</button>
+    </div>
+    <label>Last day of work:
+      <input type="date" name="lastDayOfWork" />
+    </label>
+  </div>
+  </template>
+  <div id="unemploymentContainer"></div>
+
+  <template id="retiredTemplate">
+  <div class="entry-card">
+    <div class="entry-header">
+      <h3>Retired Info</h3>
+      <button type="button" class="removeEntryBtn" aria-label="Remove entry">&times;</button>
+    </div>
+    <label>Retirement Date:
+      <input type="date" name="retirementDate" />
+    </label>
+
+    <label>Pension Source:
+      <input type="text" name="pensionSource" />
+    </label>
+  </div>
+  </template>
+  <div id="retiredContainer"></div>
+
+  <template id="disabledTemplate">
+  <div class="entry-card">
+    <div class="entry-header">
+      <h3>Disabled Info</h3>
+      <button type="button" class="removeEntryBtn" aria-label="Remove entry">&times;</button>
+    </div>
+    <label>Disability Start Date:
+      <input type="date" name="disabilityStartDate" />
+    </label>
+
+    <label>Disability Type:
+      <input type="text" name="disabilityType" />
+    </label>
+  </div>
+  </template>
+  <div id="disabledContainer"></div>
+
+  <template id="selfEmployedTemplate">
+  <div class="entry-card">
+    <div class="entry-header">
+      <h3>Self-Employed Info</h3>
+      <button type="button" class="removeEntryBtn" aria-label="Remove entry">&times;</button>
+    </div>
+    <label>Business Name:
+      <input type="text" name="businessName" />
+    </label>
+
+    <label>Business Type:
+      <input type="text" name="businessType" />
+    </label>
+
+    <label>Operations Type:
+      <select name="operationsType">
+        <option value="Sole Proprietorship">Sole Proprietorship</option>
+        <option value="Partnership">Partnership</option>
+        <option value="Corporation">Corporation</option>
+        <option value="Incorporated">Incorporated</option>
+      </select>
+    </label>
+
+    <label>Business Address:
+      <input type="text" name="businessAddress" />
+    </label>
+
+    <label>Business Start Date:
+      <input type="date" name="businessStartDate" />
+    </label>
+
+    <label>Business End Date:
+      <input type="date" name="businessEndDate" />
+    </label>
+
+    <label>Number of Employees:
+      <input type="number" name="numberOfEmployees" />
+    </label>
+
+    <label>Ownership Percentage:
+      <input type="text" name="ownershipPercentage" />
+    </label>
+
+    <label>NAICS Code:
+      <input type="text" name="naicsCode" />
+    </label>
+  </div>
+  </template>
+  <div id="selfEmployedContainer"></div>
+
+  <div class="submitRow">
+    <button type="button" id="submitEmploymentBtn">Submit Employment Info</button>
+    <span id="submitStatus"></span>
+  </div>
+  </div>
+
+<script src="./nav.js"></script>
+<script src="./gate.js"></script>
+<script src="./employment.js"></script>
+
+</body>
+</html>

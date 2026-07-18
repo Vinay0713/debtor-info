@@ -1,0 +1,176 @@
+html, body {
+  font-family: Arial, sans-serif;
+  background-color: #f0ffff;
+  margin: 0;
+  padding: 0;
+  color: #000000;
+}
+
+h1{
+  text-align: center;
+  margin-top: 0;
+  padding: 30px;
+  color: #234461;
+  background-color: #e0ffff;
+  border-style: inset;
+}
+
+.form-wrapper {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #e0ffff;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  font-size: 14px;
+  gap: 4px;
+}
+
+input, select {
+  margin-bottom: 10px;
+  border-radius: 5px;
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  font-family: inherit;
+  font-size: 14px;
+  }
+
+#Address{
+  padding: 10px 70px;
+}
+
+.name{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  margin-bottom: 20px;
+}
+
+.personalInfo{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  margin-bottom: 20px;
+}
+
+.contactInfo{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  margin-bottom: 20px;
+}
+
+.aliasName{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  margin-bottom: 20px;
+}
+
+.addressInfo{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  margin-bottom: 20px;
+}
+
+.familyInfo{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-evenly;
+  margin-bottom: 20px;
+}
+
+.entry-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 15px 20px 20px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: #fffacd;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  margin-bottom: 20px;
+}
+
+.entry-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #234461;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+}
+
+.entry-header h3 {
+  margin: 0;
+  color: #234461;
+  font-size: 18px;
+}
+
+.hint {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-style: italic;
+  color: #55707f;
+}
+
+.bankruptcyInfo p {
+  margin: 4px 0;
+  font-size: 14px;
+  font-weight: normal;
+}
+
+.bankruptcyInfo strong {
+  color: #234461;
+}
+
+.submitRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#submitPersonalBtn, #submitEmploymentBtn {
+  padding: 10px 18px;
+  border-radius: 5px;
+  font-size: 15px;
+  font-weight: bold;
+  background-color: #234461;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+#submitPersonalBtn:hover, #submitEmploymentBtn:hover {
+  background-color: #2f5d86;
+}
+
+#submitPersonalBtn:active, #submitEmploymentBtn:active {
+  transform: scale(0.97);
+}
+
+#submitStatus.success {
+  color: #1a7a1a;
+  font-weight: bold;
+}
+
+#submitStatus.error {
+  color: #b33333;
+  font-weight: bold;
+}
+

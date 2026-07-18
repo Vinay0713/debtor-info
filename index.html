@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Personal Info</title>
+  <link rel="stylesheet" type="text/css" href="nav.css">
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+  <div id="navPlaceholder"></div>
+
+  <h1>Personal info</h1>
+
+  <form id="personalForm" class="form-wrapper">
+
+  <div class="name">
+    <div id="firstName">
+    <label>First Name:
+      <input type="text" name="firstName" />
+    </label>
+    </div>
+    <div id="middleName">
+    <label>Middle Name:
+      <input type="text" name="middleName" />
+    </label>
+    </div>
+    <div id="lastName">
+    <label>Last Name:
+      <input type="text" name="lastName" />
+    </label>
+    </div>
+  </div>
+
+  <div class="aliasName">
+  <div id="aliasFirstName">
+    <label>Alias First Name:
+      <input type="text" name="aliasFirstName" />
+    </label>
+  </div>
+  <div id="aliasLastName">
+    <label>Alias Last Name:
+      <input type="text" name="aliasLastName" />
+    </label>
+  </div>
+  </div>
+
+  <div class="personalInfo">
+    <div id="dob">
+    <label>Date of Birth:
+      <input type="date" name="dateOfBirth" />
+    </label>
+    </div>
+    <div id="SIN">
+    <label>SIN Number:
+      <input type="text" name="sinNumber" />
+    </label>
+    </div>
+  </div>
+
+  <div class="contactInfo">
+    <div id="mobileNo">
+    <label>Mobile No:
+      <input type="text" name="mobileNo" />
+    </label>
+    </div>
+    <div id="email">
+    <label>Email:
+      <input type="text" name="email" />
+    </label>
+    </div>
+  </div>
+
+  <div class="addressInfo">
+    <label>Address:
+      <input type="text" id="Address" name="address" />
+    </label>
+    <label>City:
+      <input type="text" name="city" />
+    </label>
+    <label>Province:
+      <input type="text" name="province" />
+    </label>
+    <label>Postal Code:
+      <input type="text" name="postalCode" />
+    </label>
+  </div>
+
+  <div class="familyInfo">
+    <div id="maritalStatusWrap">
+    <label>Marital Status:
+      <select name="maritalStatus" id="maritalStatus">
+        <option value="Single">Single</option>
+        <option value="Divorced">Divorced</option>
+        <option value="Seperated">Seperated</option>
+        <option value="Married">Married</option>
+        <option value="Common-Law">Common-Law</option>
+      </select>
+    </label>
+    </div>
+
+    <div id="maritalStatusChangeDateWrap">
+    <label>Marital Status Change Date:
+      <input type="date" name="maritalStatusChangeDate" />
+    </label>
+    </div>
+
+    <div id="numberOfDependentsWrap">
+    <label>Number of Dependents:
+      <input type="number" name="numberOfDependents" id="numberOfDependents" min="0" />
+    </label>
+    </div>
+
+    <div id="spouseNameDiv" style="display:none;">
+    <label>Spouse Name:
+      <input type="text" name="spouseName" />
+    </label>
+    </div>
+
+    <div id="ctbDiv" style="display:none;">
+    <label>Receiving Child Tax Benefit:
+      <select name="childTaxBenefit">
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+    </label>
+    </div>
+  </div>
+
+  <div class="entry-card bankruptcyInfo">
+    <div class="entry-header">
+      <h3>Bankruptcy Info</h3>
+    </div>
+    <p class="hint">Automatically copied from the name and date of birth entered above.</p>
+    <p><strong>First Name:</strong> <span id="bankruptcyFirstNameDisplay"></span></p>
+    <p><strong>Middle Name:</strong> <span id="bankruptcyMiddleNameDisplay"></span></p>
+    <p><strong>Last Name:</strong> <span id="bankruptcyLastNameDisplay"></span></p>
+    <p><strong>Alias First Name:</strong> <span id="bankruptcyAliasFirstNameDisplay"></span></p>
+    <p><strong>Alias Last Name:</strong> <span id="bankruptcyAliasLastNameDisplay"></span></p>
+    <p><strong>Date of Birth:</strong> <span id="bankruptcyDateOfBirthDisplay"></span></p>
+    <input type="hidden" name="bankruptcyFirstName" />
+    <input type="hidden" name="bankruptcyMiddleName" />
+    <input type="hidden" name="bankruptcyLastName" />
+    <input type="hidden" name="bankruptcyAliasFirstName" />
+    <input type="hidden" name="bankruptcyAliasLastName" />
+    <input type="hidden" name="bankruptcyDateOfBirth" />
+  </div>
+
+  <div class="submitRow">
+    <button type="submit" id="submitPersonalBtn">Submit Personal Info</button>
+    <span id="submitStatus"></span>
+  </div>
+
+  </form>
+
+ <script src="nav.js"></script>
+ <script src="index.js"></script>
+</body>
+</html>

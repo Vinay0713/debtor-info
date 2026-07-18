@@ -1,0 +1,53 @@
+.site-nav {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  background-color: #234461;
+  padding: 14px 20px;
+}
+
+.nav-tab {
+  padding: 8px 16px;
+  border-radius: 5px;
+  font-size: 15px;
+  font-weight: bold;
+  text-decoration: none;
+  color: #ffffff;
+  background-color: transparent;
+  transition: background-color 0.15s ease;
+}
+
+a.nav-tab:hover {
+  background-color: #2f5d86;
+}
+
+.nav-tab.active {
+  background-color: #fffacd;
+  color: #234461;
+}
+
+.nav-tab.disabled {
+  color: #a9b7c4;
+  cursor: not-allowed;
+}
+
+.gate-notice {
+  max-width: 480px;
+  margin: 60px auto;
+  padding: 20px 25px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: #fffacd;
+  text-align: center;
+}
+
+.gate-notice h2 {
+  color: #234461;
+  margin-top: 0;
+}
+
+.gate-notice a {
+  color: #234461;
+  font-weight: bold;
+}
