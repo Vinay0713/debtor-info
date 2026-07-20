@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Income</title>
+  <link rel="stylesheet" type="text/css" href="nav.css">
+  <link rel="stylesheet" type="text/css" href="income.css">
+</head>
+<body>
+  <div id="navPlaceholder"></div>
+
+  <h1>Income</h1>
+
+  <div id="pageContent" class="income-page">
+
+  <div class="table-wrap">
+  <table class="income-table">
+    <thead>
+      <tr>
+        <th>Monthly Income</th>
+        <th>Applicant</th>
+        <th>Spouse</th>
+        <th>Other Household</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Employment Income</td>
+        <td><input type="text" name="employmentIncome_applicant" class="income-cell" /></td>
+        <td><input type="text" name="employmentIncome_spouse" class="income-cell" /></td>
+        <td><input type="text" name="employmentIncome_otherHousehold" class="income-cell" /></td>
+      </tr>
+      <tr>
+        <td>Pension/Annuities</td>
+        <td><input type="text" name="pensionAnnuities_applicant" class="income-cell" /></td>
+        <td><input type="text" name="pensionAnnuities_spouse" class="income-cell" /></td>
+        <td><input type="text" name="pensionAnnuities_otherHousehold" class="income-cell" /></td>
+      </tr>
+      <tr>
+        <td>Child Support</td>
+        <td><input type="text" name="childSupport_applicant" class="income-cell" /></td>
+        <td><input type="text" name="childSupport_spouse" class="income-cell" /></td>
+        <td><input type="text" name="childSupport_otherHousehold" class="income-cell" /></td>
+      </tr>
+      <tr>
+        <td>Spousal Support</td>
+        <td><input type="text" name="spousalSupport_applicant" class="income-cell" /></td>
+        <td><input type="text" name="spousalSupport_spouse" class="income-cell" /></td>
+        <td><input type="text" name="spousalSupport_otherHousehold" class="income-cell" /></td>
+      </tr>
+      <tr>
+        <td>Employment Insurance</td>
+        <td><input type="text" name="employmentInsurance_applicant" class="income-cell" /></td>
+        <td><input type="text" name="employmentInsurance_spouse" class="income-cell" /></td>
+        <td><input type="text" name="employmentInsurance_otherHousehold" class="income-cell" /></td>
+      </tr>
+      <tr>
+        <td>Social Assistance</td>
+        <td><input type="text" name="socialAssistance_applicant" class="income-cell" /></td>
+        <td><input type="text" name="socialAssistance_spouse" class="income-cell" /></td>
+        <td><input type="text" name="socialAssistance_otherHousehold" class="income-cell" /></td>
+      </tr>
+      <tr>
+        <td>Self Employment Income</td>
+        <td><input type="text" name="selfEmploymentIncome_applicant" class="income-cell" /></td>
+        <td><input type="text" name="selfEmploymentIncome_spouse" class="income-cell" /></td>
+        <td><input type="text" name="selfEmploymentIncome_otherHousehold" class="income-cell" /></td>
+      </tr>
+      <tr>
+        <td>Rental Income</td>
+        <td><input type="text" name="rentalIncome_applicant" class="income-cell" /></td>
+        <td><input type="text" name="rentalIncome_spouse" class="income-cell" /></td>
+        <td><input type="text" name="rentalIncome_otherHousehold" class="income-cell" /></td>
+      </tr>
+      <tr>
+        <td>Universal Child Care</td>
+        <td><input type="text" name="universalChildCare_applicant" class="income-cell" /></td>
+        <td><input type="text" name="universalChildCare_spouse" class="income-cell" /></td>
+        <td><input type="text" name="universalChildCare_otherHousehold" class="income-cell" /></td>
+      </tr>
+      <tr>
+        <td>Child Tax Benefits</td>
+        <td><input type="text" name="childTaxBenefits_applicant" class="income-cell" /></td>
+        <td><input type="text" name="childTaxBenefits_spouse" class="income-cell" /></td>
+        <td><input type="text" name="childTaxBenefits_otherHousehold" class="income-cell" /></td>
+      </tr>
+      <tr>
+        <td>Other (Specify)</td>
+        <td>
+          <input type="text" name="other_applicantDescription" class="income-desc" placeholder="Specify" />
+          <input type="text" name="other_applicant" class="income-cell" />
+        </td>
+        <td>
+          <input type="text" name="other_spouseDescription" class="income-desc" placeholder="Specify" />
+          <input type="text" name="other_spouse" class="income-cell" />
+        </td>
+        <td>
+          <input type="text" name="other_otherHouseholdDescription" class="income-desc" placeholder="Specify" />
+          <input type="text" name="other_otherHousehold" class="income-cell" />
+        </td>
+      </tr>
+      <tr class="subtotal-row">
+        <td>Sub Total</td>
+        <td>$<span id="subtotal_applicant">0.00</span></td>
+        <td>$<span id="subtotal_spouse">0.00</span></td>
+        <td>$<span id="subtotal_otherHousehold">0.00</span></td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr class="grand-total-row">
+        <td colspan="3">Total Combined Income</td>
+        <td>$<span id="totalCombinedIncome">0.00</span></td>
+      </tr>
+    </tfoot>
+  </table>
+  </div>
+
+  <div class="submitRow">
+    <button type="button" id="submitIncomeBtn">Submit Income Info</button>
+    <span id="submitStatus"></span>
+  </div>
+
+  </div>
+
+  <script src="./nav.js"></script>
+  <script src="./gate.js"></script>
+  <script src="./income.js"></script>
+</body>
+</html>

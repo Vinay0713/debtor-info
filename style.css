@@ -32,13 +32,17 @@ label {
   gap: 4px;
 }
 
-input, select {
+input, select, textarea {
   margin-bottom: 10px;
   border-radius: 5px;
   padding: 5px 10px;
   border: 1px solid #ccc;
   font-family: inherit;
   font-size: 14px;
+  }
+
+textarea {
+  resize: vertical;
   }
 
 #Address{

@@ -2,8 +2,14 @@
   const TABS = [
     { label: "Personal Info", href: "index.html", always: true },
     { label: "Employment", href: "employment.html", requires: "personalSubmitted" },
-    { label: "Assets", href: "assets.html", requires: "employmentSubmitted" },
-    { label: "Summary", href: "summary.html", requires: "assetsSubmitted" },
+    { label: "Income Calculations", href: "income-calculations.html", requires: "employmentSubmitted" },
+    { label: "Spouse & Other Member", href: "spouse-other-member.html", requires: "incomeCalculationsSubmitted" },
+    { label: "Assets", href: "assets.html", requires: "spouseOtherMemberSubmitted" },
+    { label: "Liabilities", href: "liabilities.html", requires: "assetsSubmitted" },
+    { label: "Questionnaire", href: "questionnaire.html", requires: "liabilitiesSubmitted" },
+    { label: "Income", href: "income.html", requires: "questionnaireSubmitted" },
+    { label: "Expenses", href: "expenses.html", requires: "incomeSubmitted" },
+    { label: "Summary", href: "summary.html", requires: "expensesSubmitted" },
   ];
 
   function currentPage() {

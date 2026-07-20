@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Spouse & Other Member Info</title>
+  <link rel="stylesheet" type="text/css" href="nav.css">
+  <link rel="stylesheet" type="text/css" href="spouse-other-member.css">
+</head>
+<body>
+  <div id="navPlaceholder"></div>
+
+  <h1>Spouse &amp; Other Member Info</h1>
+
+  <div id="pageContent" class="som-page">
+
+  <div class="entry-card">
+    <div class="entry-header">
+      <h3>Family Composition</h3>
+    </div>
+    <label>Number of Adults in Family:
+      <input type="number" name="numberOfAdults" id="numberOfAdults" min="0" />
+    </label>
+    <label>Number of Dependents in Family:
+      <input type="text" name="numberOfDependents" id="numberOfDependents" readonly />
+    </label>
+  </div>
+
+  <div id="otherAdultsSection" class="entry-card" style="display:none;">
+    <div class="entry-header">
+      <h3>Other Adults in Household</h3>
+    </div>
+    <div class="button-group">
+      <button type="button" id="addOtherAdultBtn">Add Other Adult</button>
+    </div>
+    <div id="otherAdultsContainer" class="entry-list"></div>
+  </div>
+
+  <template id="otherAdultTemplate">
+  <div class="entry-card">
+    <div class="entry-header">
+      <h3>Other Adult</h3>
+      <button type="button" class="removeEntryBtn" aria-label="Remove entry">&times;</button>
+    </div>
+    <label>Description:
+      <input type="text" name="description" placeholder="e.g. Adult Child, Roommate" />
+    </label>
+    <label>Are They Earning Any Income?
+      <select name="earningIncome" class="earning-income-select">
+        <option value=""></option>
+        <option value="No">No</option>
+        <option value="Yes">Yes</option>
+      </select>
+    </label>
+    <label class="income-field" style="display:none;">Income:
+      <input type="text" name="income" />
+    </label>
+  </div>
+  </template>
+
+  <div id="spouseSection" class="entry-card" style="display:none;">
+    <div class="entry-header">
+      <h3>Spouse Income</h3>
+    </div>
+    <label>Is Spouse Earning Any Income?
+      <select name="spouseEarningIncome" id="spouseEarningIncome">
+        <option value=""></option>
+        <option value="No">No</option>
+        <option value="Yes">Yes</option>
+      </select>
+    </label>
+    <label id="spouseIncomeField" style="display:none;">Income:
+      <input type="text" name="spouseIncome" id="spouseIncome" />
+    </label>
+  </div>
+
+  <div class="entry-card">
+    <div class="entry-header">
+      <h3>Child Support</h3>
+    </div>
+    <label>Receiving Child Support?
+      <select name="receivingChildSupport" id="receivingChildSupport">
+        <option value=""></option>
+        <option value="No">No</option>
+        <option value="Yes">Yes</option>
+      </select>
+    </label>
+    <label id="childSupportAmountField" style="display:none;">Amount:
+      <input type="text" name="childSupportAmount" id="childSupportAmount" />
+    </label>
+  </div>
+
+  <div class="entry-card">
+    <div class="entry-header">
+      <h3>Spousal Support</h3>
+    </div>
+    <label>Receiving Spousal Support?
+      <select name="receivingSpousalSupport" id="receivingSpousalSupport">
+        <option value=""></option>
+        <option value="No">No</option>
+        <option value="Yes">Yes</option>
+      </select>
+    </label>
+    <label id="spousalSupportAmountField" style="display:none;">Amount:
+      <input type="text" name="spousalSupportAmount" id="spousalSupportAmount" />
+    </label>
+  </div>
+
+  <div class="submitRow">
+    <button type="button" id="submitSomBtn">Submit &amp; Push to Income</button>
+    <span id="submitStatus"></span>
+  </div>
+
+  </div>
+
+  <script src="./nav.js"></script>
+  <script src="./gate.js"></script>
+  <script src="./spouse-other-member.js"></script>
+</body>
+</html>

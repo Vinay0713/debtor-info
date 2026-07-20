@@ -55,6 +55,21 @@
       <input type="text" name="sinNumber" />
     </label>
     </div>
+    <div id="sex">
+    <label>Sex:
+      <select name="sex">
+        <option value=""></option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+      </select>
+    </label>
+    </div>
+    <div id="highestEducation">
+    <label>Highest Level of Education:
+      <input type="text" name="highestEducation" />
+    </label>
+    </div>
   </div>
 
   <div class="contactInfo">
@@ -89,6 +104,7 @@
     <div id="maritalStatusWrap">
     <label>Marital Status:
       <select name="maritalStatus" id="maritalStatus">
+        <option value=""></option>
         <option value="Single">Single</option>
         <option value="Divorced">Divorced</option>
         <option value="Seperated">Seperated</option>
@@ -119,11 +135,21 @@
     <div id="ctbDiv" style="display:none;">
     <label>Receiving Child Tax Benefit:
       <select name="childTaxBenefit">
+        <option value=""></option>
         <option value="Yes">Yes</option>
         <option value="No">No</option>
       </select>
     </label>
     </div>
+  </div>
+
+  <div class="entry-card">
+    <div class="entry-header">
+      <h3>Financial Difficulties</h3>
+    </div>
+    <label>Reason of Financial Difficulties:
+      <textarea name="reasonFinancialDifficulties" rows="4"></textarea>
+    </label>
   </div>
 
   <div class="entry-card bankruptcyInfo">

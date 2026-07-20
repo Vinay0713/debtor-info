@@ -17,6 +17,7 @@
   <button id="retiredBtn">Add Retired Info</button>
   <button id="disabledBtn">Add Disabled Info</button>
   <button id="selfEmployedBtn">Add Self-Employed Info</button>
+  <button id="benefitsBtn">Add Benefits Info</button>
   </div>
 
   <template id="employmentTemplate">
@@ -31,6 +32,15 @@
 
     <label>Job Title:
       <input type="text" name="jobTitle" />
+    </label>
+
+    <label>Type of Employment:
+      <select name="employmentType">
+        <option value=""></option>
+        <option value="Full-time">Full-time</option>
+        <option value="Part-time">Part-time</option>
+        <option value="Seasonal">Seasonal</option>
+      </select>
     </label>
 
     <label>Date of joining:
@@ -103,6 +113,7 @@
 
     <label>Operations Type:
       <select name="operationsType">
+        <option value=""></option>
         <option value="Sole Proprietorship">Sole Proprietorship</option>
         <option value="Partnership">Partnership</option>
         <option value="Corporation">Corporation</option>
@@ -136,6 +147,23 @@
   </div>
   </template>
   <div id="selfEmployedContainer"></div>
+
+  <template id="benefitsTemplate">
+  <div class="entry-card">
+    <div class="entry-header">
+      <h3>Benefits Info</h3>
+      <button type="button" class="removeEntryBtn" aria-label="Remove entry">&times;</button>
+    </div>
+    <label>Benefit Type:
+      <input type="text" name="benefitType" />
+    </label>
+
+    <label>Benefit Start Date:
+      <input type="date" name="benefitStartDate" />
+    </label>
+  </div>
+  </template>
+  <div id="benefitsContainer"></div>
 
   <div class="submitRow">
     <button type="button" id="submitEmploymentBtn">Submit Employment Info</button>

@@ -8,71 +8,26 @@ html, body {
 
 h1 {
    text-align: center;
-   margin-top: 20px;
+   margin-top: 0;
    padding: 30px;
    color: #234461;
    background-color: #e0ffff;
    border-style: inset;
 }
 
-
-
-.income-info {
-   margin: 100px;
-   padding: 10px;
-   border-radius: 5px;
-   border: 1px solid #ccc;
-   background-color:#e0ffff;
-}
-
-.button-group {
+.som-page {
+   max-width: 700px;
+   margin: 40px auto;
+   padding: 10px 20px 40px;
    display: flex;
-   flex-wrap: wrap;
-   justify-content: center;
-   gap: 12px;
-   padding: 20px 50px;
-}
-
-#employedBtn, #unemployedBtn, #selfEmployedBtn, #retiredBtn, #disabledBtn, #benefitsBtn {
-   padding: 10px 18px;
-   border-radius: 5px;
-   font-size: 15px;
-   font-weight: bold;
-   background-color: #234461;
-   color: #ffffff;
-   border: none;
-   cursor: pointer;
-   transition: background-color 0.15s ease, transform 0.1s ease;
-}
-
-#employedBtn:hover, #unemployedBtn:hover, #selfEmployedBtn:hover, #retiredBtn:hover, #disabledBtn:hover, #benefitsBtn:hover {
-   background-color: #2f5d86;
-}
-
-#employedBtn:active, #unemployedBtn:active, #selfEmployedBtn:active, #retiredBtn:active, #disabledBtn:active, #benefitsBtn:active {
-   transform: scale(0.97);
-}
-
-#employmentContainer,
-#unemploymentContainer,
-#retiredContainer,
-#disabledContainer,
-#selfEmployedContainer,
-#benefitsContainer {
-   background-color: #fffacd;
-   display: flex;
-   flex-wrap: wrap;
-   align-items: flex-start;
-   justify-content: center;
+   flex-direction: column;
    gap: 20px;
-   padding: 20px 50px;
 }
 
 .entry-card {
    display: flex;
    flex-direction: column;
    gap: 10px;
-   width: 320px;
    padding: 15px 20px 20px;
    border-radius: 8px;
    border: 1px solid #ccc;
@@ -95,23 +50,6 @@ h1 {
    font-size: 18px;
 }
 
-.removeEntryBtn {
-   width: 26px;
-   height: 26px;
-   line-height: 1;
-   border: none;
-   border-radius: 50%;
-   background-color: #d64545;
-   color: #ffffff;
-   font-size: 16px;
-   cursor: pointer;
-   transition: background-color 0.15s ease;
-}
-
-.removeEntryBtn:hover {
-   background-color: #b33333;
-}
-
 .entry-card label {
    display: flex;
    flex-direction: column;
@@ -129,16 +67,41 @@ h1 {
    font-family: inherit;
 }
 
-.submitRow {
-   display: flex;
-   align-items: center;
-   gap: 12px;
-   width: 100%;
-   justify-content: center;
-   padding: 10px 0 20px;
+.entry-card input[readonly] {
+   background-color: #e8e8e8;
+   color: #555555;
+   cursor: not-allowed;
 }
 
-#submitEmploymentBtn {
+.entry-list {
+   display: flex;
+   flex-direction: column;
+   gap: 20px;
+}
+
+.removeEntryBtn {
+   width: 26px;
+   height: 26px;
+   line-height: 1;
+   border: none;
+   border-radius: 50%;
+   background-color: #d64545;
+   color: #ffffff;
+   font-size: 16px;
+   cursor: pointer;
+   transition: background-color 0.15s ease;
+}
+
+.removeEntryBtn:hover {
+   background-color: #b33333;
+}
+
+.button-group {
+   display: flex;
+   justify-content: center;
+}
+
+#addOtherAdultBtn {
    padding: 10px 18px;
    border-radius: 5px;
    font-size: 15px;
@@ -150,11 +113,38 @@ h1 {
    transition: background-color 0.15s ease, transform 0.1s ease;
 }
 
-#submitEmploymentBtn:hover {
+#addOtherAdultBtn:hover {
    background-color: #2f5d86;
 }
 
-#submitEmploymentBtn:active {
+#addOtherAdultBtn:active {
+   transform: scale(0.97);
+}
+
+.submitRow {
+   display: flex;
+   align-items: center;
+   gap: 12px;
+   justify-content: center;
+}
+
+#submitSomBtn {
+   padding: 10px 18px;
+   border-radius: 5px;
+   font-size: 15px;
+   font-weight: bold;
+   background-color: #234461;
+   color: #ffffff;
+   border: none;
+   cursor: pointer;
+   transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+#submitSomBtn:hover {
+   background-color: #2f5d86;
+}
+
+#submitSomBtn:active {
    transform: scale(0.97);
 }
 

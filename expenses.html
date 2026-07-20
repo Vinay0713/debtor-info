@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Expenses</title>
+  <link rel="stylesheet" type="text/css" href="nav.css">
+  <link rel="stylesheet" type="text/css" href="expenses.css">
+</head>
+<body>
+  <div id="navPlaceholder"></div>
+
+  <h1>Expenses</h1>
+
+  <div id="pageContent" class="expenses-page">
+
+  <div class="table-wrap">
+  <table class="expenses-table">
+    <thead>
+      <tr>
+        <th>Monthly Non-Discretionary Expenses</th>
+        <th>Amount</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Child Support Payments</td>
+        <td><input type="text" name="childSupportPayments" class="expense-cell" /></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Spousal Support Payments</td>
+        <td><input type="text" name="spousalSupportPayments" class="expense-cell" /></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Child Care</td>
+        <td><input type="text" name="childCare" class="expense-cell" /></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Medical Condition Expenses</td>
+        <td><input type="text" name="medicalConditionExpenses" class="expense-cell" /></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Fines/Penalties Imposed by Court</td>
+        <td><input type="text" name="finesPenaltiesCourt" class="expense-cell" /></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Expenses as a Condition of Employment</td>
+        <td><input type="text" name="employmentConditionExpenses" class="expense-cell" /></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Debts Where Stay Has Been Filed</td>
+        <td><input type="text" name="debtsStayFiled" class="expense-cell" /></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Business Related Expenses</td>
+        <td><input type="text" name="businessRelatedExpenses" class="expense-cell" /></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td colspan="3">
+          <button type="button" id="addOtherBtn_nonDiscretionary" class="addOtherBtn">Add Other (Specify) Expense</button>
+        </td>
+      </tr>
+    </tbody>
+    <tbody id="otherContainer_nonDiscretionary"></tbody>
+    <tfoot>
+      <tr class="grand-total-row">
+        <td>Total Combined Expenses</td>
+        <td>$<span id="subtotal_nonDiscretionary">0.00</span></td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
+  </div>
+
+  <div class="table-wrap">
+  <table class="expenses-table">
+    <thead>
+      <tr>
+        <th>Housing Expenses</th>
+        <th>Amount</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Rent</td><td><input type="text" name="housingRent" class="expense-cell" /></td><td></td></tr>
+      <tr><td>Heat / Gas</td><td><input type="text" name="housingHeatGas" class="expense-cell" /></td><td></td></tr>
+      <tr><td>Propane</td><td><input type="text" name="housingPropane" class="expense-cell" /></td><td></td></tr>
+      <tr><td>Telephone</td><td><input type="text" name="housingTelephone" class="expense-cell" /></td><td></td></tr>
+      <tr><td>Power</td><td><input type="text" name="housingPower" class="expense-cell" /></td><td></td></tr>
+      <tr><td>Cable</td><td><input type="text" name="housingCable" class="expense-cell" /></td><td></td></tr>
+      <tr><td>Water</td><td><input type="text" name="housingWater" class="expense-cell" /></td><td></td></tr>
+      <tr><td>Furniture</td><td><input type="text" name="housingFurniture" class="expense-cell" /></td><td></td></tr>
+      <tr><td>Household Maintenance</td><td><input type="text" name="housingHouseholdMaintenance" class="expense-cell" /></td><td></td></tr>
+      <tr>
+        <td colspan="3">
+          <button type="button" id="addOtherBtn_housing" class="addOtherBtn">Add Other (Specify) Expense</button>
+        </td>
+      </tr>
+    </tbody>
+    <tbody id="otherContainer_housing"></tbody>
+    <tfoot>
+      <tr class="subtotal-row">
+        <td>Sub Total</td>
+        <td>$<span id="subtotal_housing">0.00</span></td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
+  </div>
+
+  <div class="table-wrap">
+  <table class="expenses-table">
+    <thead>
+      <tr>
+        <th>Personal Expenses</th>
+        <th>Amount</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Smoking</td><td><input type="text" name="personalSmoking" class="expense-cell" /></td><td></td></tr>
+      <tr><td>Alcohol</td><td><input type="text" name="personalAlcohol" class="expense-cell" /></td><td></td></tr>
+      <tr><td>Dining/Lunches/Restaurant</td><td><input type="text" name="personalDining" class="expense-cell" /></td><td></td></tr>
+      <tr><td>Entertainment/Sports</td><td><input type="text" name="personalEntertainment" class="expense-cell" /></td><td></td></tr>
+      <tr><td>Gifts/Charitable Expense</td><td><input type="text" name="personalGifts" class="expense-cell" /></td><td></td></tr>
+      <tr><td>Allowance</td><td><input type="text" name="personalAllowance" class="expense-cell" /></td><td></td></tr>
+      <tr><td>Newspaper/Magazine</td><td><input type="text" name="personalNewspaperMagazine" class="expense-cell" /></td><td></td></tr>
+      <tr><td>For His Child's Clothes and Shoes</td><td><input type="text" name="personalChildClothesShoes" class="expense-cell" /></td><td></td></tr>
+      <tr>
+        <td colspan="3">
+          <button type="button" id="addOtherBtn_personal" class="addOtherBtn">Add Other (Specify) Expense</button>
+        </td>
+      </tr>
+    </tbody>
+    <tbody id="otherContainer_personal"></tbody>
+    <tfoot>
+      <tr class="subtotal-row">
+        <td>Sub Total</td>
+        <td>$<span id="subtotal_personal">0.00</span></td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
+  </div>
+
+  <div class="table-wrap">
+  <table class="expenses-table">
+    <thead>
+      <tr>
+        <th>Medical Expenses</th>
+        <th>Amount</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Prescriptions</td><td><input type="text" name="medicalPrescriptions" class="expense-cell" /></td><td></td></tr>
+      <tr><td>Dental</td><td><input type="text" name="medicalDental" class="expense-cell" /></td><td></td></tr>
+      <tr>
+        <td colspan="3">
+          <button type="button" id="addOtherBtn_medical" class="addOtherBtn">Add Other (Specify) Expense</button>
+        </td>
+      </tr>
+    </tbody>
+    <tbody id="otherContainer_medical"></tbody>
+    <tfoot>
+      <tr class="subtotal-row">
+        <td>Sub Total</td>
+        <td>$<span id="subtotal_medical">0.00</span></td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
+  </div>
+
+  <div class="table-wrap">
+  <table class="expenses-table">
+    <thead>
+      <tr>
+        <th>Living Expenses</th>
+        <th>Amount</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Food/Grocery</td><td><input type="text" name="livingFoodGrocery" class="expense-cell" /></td><td></td></tr>
+      <tr><td>Laundry/Dry Cleaning</td><td><input type="text" name="livingLaundryDryCleaning" class="expense-cell" /></td><td></td></tr>
+      <tr><td>Grooming/Toiletries</td><td><input type="text" name="livingGroomingToiletries" class="expense-cell" /></td><td></td></tr>
+      <tr><td>Clothing</td><td><input type="text" name="livingClothing" class="expense-cell" /></td><td></td></tr>
+      <tr>
+        <td colspan="3">
+          <button type="button" id="addOtherBtn_living" class="addOtherBtn">Add Other (Specify) Expense</button>
+        </td>
+      </tr>
+    </tbody>
+    <tbody id="otherContainer_living"></tbody>
+    <tfoot>
+      <tr class="subtotal-row">
+        <td>Sub Total</td>
+        <td>$<span id="subtotal_living">0.00</span></td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
+  </div>
+
+  <div class="table-wrap">
+  <table class="expenses-table">
+    <thead>
+      <tr>
+        <th>Transportation Expenses</th>
+        <th>Amount</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Car Lease/Finance Payments</td><td><input type="text" name="transportationCarLeaseFinance" class="expense-cell" /></td><td></td></tr>
+      <tr><td>Repair/Maintenance/Gas</td><td><input type="text" name="transportationRepairMaintenanceGas" class="expense-cell" /></td><td></td></tr>
+      <tr><td>Repair/Maintenance</td><td><input type="text" name="transportationRepairMaintenance" class="expense-cell" /></td><td></td></tr>
+      <tr>
+        <td colspan="3">
+          <button type="button" id="addOtherBtn_transportation" class="addOtherBtn">Add Other (Specify) Expense</button>
+        </td>
+      </tr>
+    </tbody>
+    <tbody id="otherContainer_transportation"></tbody>
+    <tfoot>
+      <tr class="subtotal-row">
+        <td>Sub Total</td>
+        <td>$<span id="subtotal_transportation">0.00</span></td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
+  </div>
+
+  <div class="table-wrap">
+  <table class="expenses-table">
+    <thead>
+      <tr>
+        <th>Insurance Expenses</th>
+        <th>Amount</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Vehicle</td><td><input type="text" name="insuranceVehicle" class="expense-cell" /></td><td></td></tr>
+      <tr><td>House</td><td><input type="text" name="insuranceHouse" class="expense-cell" /></td><td></td></tr>
+      <tr><td>Furniture/Contents</td><td><input type="text" name="insuranceFurnitureContents" class="expense-cell" /></td><td></td></tr>
+      <tr><td>Life Insurance</td><td><input type="text" name="insuranceLife" class="expense-cell" /></td><td></td></tr>
+      <tr>
+        <td colspan="3">
+          <button type="button" id="addOtherBtn_insurance" class="addOtherBtn">Add Other (Specify) Expense</button>
+        </td>
+      </tr>
+    </tbody>
+    <tbody id="otherContainer_insurance"></tbody>
+    <tfoot>
+      <tr class="subtotal-row">
+        <td>Sub Total</td>
+        <td>$<span id="subtotal_insurance">0.00</span></td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
+  </div>
+
+  <div class="table-wrap">
+  <table class="expenses-table">
+    <thead>
+      <tr>
+        <th>Payments</th>
+        <th>Amount</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>CP Payments</td><td><input type="text" name="paymentsCP" class="expense-cell" /></td><td></td></tr>
+      <tr><td>Church Donation (Tithe)</td><td><input type="text" name="paymentsChurchDonation" class="expense-cell" /></td><td></td></tr>
+      <tr><td>Settlement on Assets</td><td><input type="text" name="paymentsSettlementOnAssets" class="expense-cell" /></td><td></td></tr>
+      <tr><td>To Secured Payments</td><td><input type="text" name="paymentsToSecuredPayments" class="expense-cell" /></td><td></td></tr>
+      <tr>
+        <td colspan="3">
+          <button type="button" id="addOtherBtn_payments" class="addOtherBtn">Add Other (Specify) Expense</button>
+        </td>
+      </tr>
+    </tbody>
+    <tbody id="otherContainer_payments"></tbody>
+    <tfoot>
+      <tr class="subtotal-row">
+        <td>Sub Total</td>
+        <td>$<span id="subtotal_payments">0.00</span></td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
+  </div>
+
+  <template id="otherExpenseTemplate">
+    <tr class="other-expense-row">
+      <td><input type="text" name="otherDescription" class="expense-desc" placeholder="Specify" /></td>
+      <td><input type="text" name="otherAmount" class="expense-cell" /></td>
+      <td><button type="button" class="removeEntryBtn" aria-label="Remove entry">&times;</button></td>
+    </tr>
+  </template>
+
+  <div id="floatingSummaryPanel" class="floating-summary-panel">
+    <div class="total-box">All Expenses Total: $<span id="allExpensesTotal">0.00</span></div>
+    <div class="total-box">Income Total: $<span id="incomeTotalDisplay">0.00</span></div>
+    <div class="total-box" id="surplusDeficitBox">Surplus/Deficit: $<span id="surplusDeficit">0.00</span></div>
+    <button type="button" id="submitExpensesBtn">Submit Expenses Info</button>
+    <span id="submitStatus"></span>
+  </div>
+
+  </div>
+
+  <script src="./nav.js"></script>
+  <script src="./gate.js"></script>
+  <script src="./expenses.js"></script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Income Calculations</title>
+  <link rel="stylesheet" type="text/css" href="nav.css">
+  <link rel="stylesheet" type="text/css" href="income-calculations.css">
+</head>
+<body>
+  <div id="navPlaceholder"></div>
+
+  <h1>Income Calculations</h1>
+
+  <div id="pageContent" class="income-calc-page">
+
+  <section id="debtorSection">
+    <h2>Debtor Income Calculations</h2>
+    <div id="debtorEmployedContainer" class="calc-category"></div>
+    <div id="debtorUnemployedContainer" class="calc-category"></div>
+    <div id="debtorRetiredContainer" class="calc-category"></div>
+    <div id="debtorDisabledContainer" class="calc-category"></div>
+    <div id="debtorSelfEmployedContainer" class="calc-category"></div>
+    <div id="debtorBenefitsContainer" class="calc-category"></div>
+    <p id="debtorEmptyNotice" class="empty-notice" style="display:none;">No employment entries were submitted on the Employment page, so there is nothing to calculate here.</p>
+  </section>
+
+  <section id="spouseSection" style="display:none;">
+    <h2>Spouse Income Calculations</h2>
+    <div class="button-group">
+      <button type="button" id="addSpouseEmployedBtn">Add Spouse Employed Info</button>
+      <button type="button" id="addSpouseUnemployedBtn">Add Spouse Unemployed Info</button>
+      <button type="button" id="addSpouseRetiredBtn">Add Spouse Retired Info</button>
+      <button type="button" id="addSpouseBenefitsBtn">Add Spouse Benefits Info</button>
+    </div>
+    <div id="spouseEmployedContainer" class="calc-category"></div>
+    <div id="spouseUnemployedContainer" class="calc-category"></div>
+    <div id="spouseRetiredContainer" class="calc-category"></div>
+    <div id="spouseBenefitsContainer" class="calc-category"></div>
+  </section>
+
+  <div id="pushSummaryBox" class="push-summary-box"></div>
+
+  <div class="submitRow">
+    <button type="button" id="submitIncomeCalculationsBtn">Submit &amp; Push to Income</button>
+    <span id="submitStatus"></span>
+  </div>
+
+  </div>
+
+  <script src="./nav.js"></script>
+  <script src="./gate.js"></script>
+  <script src="./income-calculations.js"></script>
+</body>
+</html>

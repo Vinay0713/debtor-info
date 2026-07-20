@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Liabilities</title>
+  <link rel="stylesheet" type="text/css" href="nav.css">
+  <link rel="stylesheet" type="text/css" href="liabilities.css">
+</head>
+<body>
+  <div id="navPlaceholder"></div>
+
+  <h1>Liabilities</h1>
+
+  <div id="pageContent" class="liabilities-info">
+
+  <div class="button-group">
+    <button id="addLiabilityBtn">Add Liability</button>
+  </div>
+
+  <datalist id="creditorNameOptions">
+    <option value="Amex"></option>
+    <option value="Alectra"></option>
+    <option value="B2B Bank"></option>
+    <option value="Business Development Bank of Canada"></option>
+    <option value="Bank of Montreal"></option>
+    <option value="Canadian Tire (Triangle Mastercard)"></option>
+    <option value="Capital One"></option>
+    <option value="CIBC"></option>
+    <option value="CRA"></option>
+    <option value="Desjardins"></option>
+    <option value="RBC (Royal Bank of Canada)"></option>
+    <option value="TD"></option>
+    <option value="Others"></option>
+  </datalist>
+
+  <template id="liabilityTemplate">
+  <div class="entry-card">
+    <div class="entry-header">
+      <h3>Liability</h3>
+      <button type="button" class="removeEntryBtn" aria-label="Remove entry">&times;</button>
+    </div>
+
+    <label>Creditor Name:
+      <input type="text" list="creditorNameOptions" name="creditorName" class="creditor-name-input" autocomplete="off" />
+    </label>
+    <label class="creditor-name-other" style="display:none;">Creditor Name (please specify):
+      <input type="text" name="creditorNameOther" />
+    </label>
+
+    <label>Liability Detail:
+      <select name="liabilityDetail">
+        <option value=""></option>
+        <option value="Personal">Personal</option>
+        <option value="Business">Business</option>
+      </select>
+    </label>
+
+    <label>Type of Ownership:
+      <select name="ownershipType">
+        <option value=""></option>
+        <option value="Personal">Personal</option>
+        <option value="Joint">Joint</option>
+      </select>
+    </label>
+
+    <label>Type of Debt:
+      <select name="debtType" class="debt-type-select">
+        <option value=""></option>
+        <option value="Credit Card">Credit Card</option>
+        <option value="Bank Loan">Bank Loan</option>
+        <option value="Taxes - Personal">Taxes - Personal</option>
+        <option value="Taxes - CRA">Taxes - CRA</option>
+        <option value="Finance Company Loans">Finance Company Loans</option>
+        <option value="Utility">Utility</option>
+        <option value="Other">Other</option>
+      </select>
+    </label>
+    <label class="debt-type-description" style="display:none;">Description:
+      <input type="text" name="debtTypeDescription" />
+    </label>
+
+    <label>Type:
+      <select name="debtSecurityType" class="debt-security-select">
+        <option value=""></option>
+        <option value="Unsecured">Unsecured</option>
+        <option value="Secured">Secured</option>
+        <option value="Contingent">Contingent (co-signed on secured debt for vehicle, property, or other asset)</option>
+      </select>
+    </label>
+    <label class="secured-against" style="display:none;">Secured Against:
+      <input type="text" name="securedAgainst" />
+    </label>
+
+    <label>Debt Amount:
+      <input type="text" name="debtAmount" class="debt-amount-input" />
+    </label>
+  </div>
+  </template>
+  <div id="liabilityContainer" class="entry-list"></div>
+
+  <div id="floatingSummaryPanel" class="floating-summary-panel">
+    <div class="total-box">Total Secured Debt: $<span id="totalSecuredDebt">0.00</span></div>
+    <div class="total-box">Total Unsecured Debt: $<span id="totalUnsecuredDebt">0.00</span></div>
+    <button type="button" id="submitLiabilitiesBtn">Submit Liabilities Info</button>
+    <span id="submitStatus"></span>
+  </div>
+
+  </div>
+
+  <script src="./nav.js"></script>
+  <script src="./gate.js"></script>
+  <script src="./liabilities.js"></script>
+</body>
+</html>

@@ -32,13 +32,14 @@
       <div class="entry-fields">
         <label>Property Type:
           <select class="type-select" name="propertyType">
+            <option value=""></option>
             <option value="House">House</option>
             <option value="Mobile Home">Mobile Home</option>
             <option value="Trailer">Trailer</option>
           </select>
         </label>
 
-        <div class="type-group" data-type="House">
+        <div class="type-group" data-type="House" style="display:none;">
           <label>Address:
             <input type="text" name="houseAddress" />
           </label>
@@ -53,6 +54,7 @@
           </label>
           <label>Residence:
             <select name="residenceType">
+              <option value=""></option>
               <option value="Primary">Primary</option>
               <option value="Secondary">Secondary</option>
             </select>
@@ -101,7 +103,7 @@
 
       <div class="entry-note">
         <h4>Notes</h4>
-        <ol class="note-list" data-note="House">
+        <ol class="note-list" data-note="House" style="display:none;">
           <li>Value doc preference: Purview &gt; Realtor Opinion &gt; Honestdoor &gt; Property Assessment.</li>
           <li>For property assessments, take prior approval from the concerned person.</li>
           <li>If title is not clear on Purview, or using Honestdoor and Realtor Opinion, ask for the title doc.</li>
@@ -130,6 +132,7 @@
       <div class="entry-fields">
         <label>Vehicle Type:
           <select class="type-select" name="vehicleType">
+            <option value=""></option>
             <optgroup label="Vehicle">
               <option value="Car">Car</option>
               <option value="Motorcycle">Motorcycle</option>
@@ -193,6 +196,7 @@
     <div class="entry-fields">
       <label>Policy Type:
         <select class="type-select" name="policyType">
+          <option value=""></option>
           <option value="RRSP">RRSP</option>
           <option value="DPSP">DPSP</option>
           <option value="RESP">RESP</option>
@@ -201,7 +205,7 @@
         </select>
       </label>
 
-      <div class="type-group" data-type="RRSP">
+      <div class="type-group" data-type="RRSP" style="display:none;">
         <label>Policy Provider Name:
           <input type="text" name="rrspProviderName" />
         </label>
@@ -282,6 +286,7 @@
     <div class="entry-fields">
       <label>Security Type:
         <select class="type-select" name="securityType">
+          <option value=""></option>
           <option value="Mutual Fund">Mutual Fund</option>
           <option value="Bonds">Bonds</option>
           <option value="Crypto">Crypto</option>

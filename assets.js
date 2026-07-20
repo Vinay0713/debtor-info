@@ -1,9 +1,9 @@
 document.addEventListener("DOMContentLoaded", async () => {
     const allowed = await Gate.enforce(
-        "employmentSubmitted",
+        "spouseOtherMemberSubmitted",
         "#pageContent",
-        "Please submit Employment Info first.",
-        "employment.html"
+        "Please submit Spouse & Other Member Info first.",
+        "spouse-other-member.html"
     );
     if (!allowed) return;
 
@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const removeBtn = card.querySelector(".removeEntryBtn");
             removeBtn.addEventListener("click", () => card.remove());
             if (onClone) onClone(card);
-            container.appendChild(clone);
+            container.prepend(clone);
         });
     }
 

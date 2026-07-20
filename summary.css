@@ -104,3 +104,21 @@ h1 {
    font-size: 14px;
    word-break: break-word;
 }
+
+.totals-row {
+   display: flex;
+   flex-wrap: wrap;
+   gap: 20px;
+   justify-content: center;
+   padding: 10px 0;
+}
+
+.total-box {
+   padding: 12px 20px;
+   border-radius: 8px;
+   border: 1px solid #234461;
+   background-color: #fffacd;
+   font-weight: bold;
+   font-size: 14px;
+   color: #234461;
+}

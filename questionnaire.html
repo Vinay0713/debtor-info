@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Questionnaire</title>
+  <link rel="stylesheet" type="text/css" href="nav.css">
+  <link rel="stylesheet" type="text/css" href="questionnaire.css">
+</head>
+<body>
+  <div id="navPlaceholder"></div>
+
+  <h1>Questionnaire</h1>
+
+  <div id="pageContent" class="questionnaire-info">
+
+  <aside class="section-note">
+    <h4>Notes</h4>
+    <p>This questionnaire captures recent property transfers, seizures, expected funds, and gifts relevant to the bankruptcy filing.</p>
+    <p><em>More questions will be added here soon.</em></p>
+  </aside>
+
+  <div class="question-block">
+    <div class="entry-header">
+      <h3>Sold/Transferred Property (Last 5 Years)</h3>
+    </div>
+    <div class="radio-group">
+      <label><input type="radio" name="soldTransferredProperty" class="question-radio" value="Yes" /> Yes</label>
+      <label><input type="radio" name="soldTransferredProperty" class="question-radio" value="No" /> No</label>
+    </div>
+    <label class="detail-textarea" style="display:none;">Please describe in detail:
+      <textarea name="soldTransferredPropertyDetails" rows="3"></textarea>
+    </label>
+  </div>
+
+  <div class="question-block">
+    <div class="entry-header">
+      <h3>Property Seized/Repossessed</h3>
+    </div>
+    <div class="radio-group">
+      <label><input type="radio" name="propertySeizedRepossessed" class="question-radio" value="Yes" /> Yes</label>
+      <label><input type="radio" name="propertySeizedRepossessed" class="question-radio" value="No" /> No</label>
+    </div>
+    <label class="detail-textarea" style="display:none;">Please describe in detail:
+      <textarea name="propertySeizedRepossessedDetails" rows="3"></textarea>
+    </label>
+  </div>
+
+  <div class="question-block">
+    <div class="entry-header">
+      <h3>Expect Large Funds (Next 12 Months)</h3>
+    </div>
+    <div class="radio-group">
+      <label><input type="radio" name="expectLargeFunds" class="question-radio" value="Yes" /> Yes</label>
+      <label><input type="radio" name="expectLargeFunds" class="question-radio" value="No" /> No</label>
+    </div>
+    <label class="detail-textarea" style="display:none;">Please describe in detail:
+      <textarea name="expectLargeFundsDetails" rows="3"></textarea>
+    </label>
+  </div>
+
+  <div class="question-block">
+    <div class="entry-header">
+      <h3>Gifts Over $500 (Last 12 Months)</h3>
+    </div>
+    <div class="radio-group">
+      <label><input type="radio" name="giftsOverFiveHundred" class="question-radio" value="Yes" /> Yes</label>
+      <label><input type="radio" name="giftsOverFiveHundred" class="question-radio" value="No" /> No</label>
+    </div>
+    <label class="detail-textarea" style="display:none;">Please describe in detail:
+      <textarea name="giftsOverFiveHundredDetails" rows="3"></textarea>
+    </label>
+  </div>
+
+  <div class="submitRow">
+    <button type="button" id="submitQuestionnaireBtn">Submit Questionnaire</button>
+    <span id="submitStatus"></span>
+  </div>
+
+  </div>
+
+  <script src="./nav.js"></script>
+  <script src="./gate.js"></script>
+  <script src="./questionnaire.js"></script>
+</body>
+</html>

@@ -1,0 +1,251 @@
+html, body {
+   font-family: Arial, sans-serif;
+   background-color: #f0ffff;
+   margin: 0;
+   padding: 0;
+   color: #000000;
+}
+
+h1 {
+   text-align: center;
+   margin-top: 0;
+   padding: 30px;
+   color: #234461;
+   background-color: #e0ffff;
+   border-style: inset;
+}
+
+.income-calc-page {
+   max-width: 800px;
+   margin: 40px auto;
+   padding: 10px 20px 40px;
+   display: flex;
+   flex-direction: column;
+   gap: 20px;
+}
+
+.income-calc-page h2 {
+   color: #234461;
+   border-bottom: 2px solid #234461;
+   padding-bottom: 6px;
+   margin-top: 10px;
+}
+
+.income-calc-page h3 {
+   color: #234461;
+   margin: 10px 0 0;
+   font-size: 15px;
+}
+
+.empty-notice {
+   font-style: italic;
+   color: #55707f;
+}
+
+.button-group {
+   display: flex;
+   flex-wrap: wrap;
+   justify-content: center;
+   gap: 12px;
+   padding: 10px 0;
+}
+
+.button-group button {
+   padding: 10px 18px;
+   border-radius: 5px;
+   font-size: 14px;
+   font-weight: bold;
+   background-color: #234461;
+   color: #ffffff;
+   border: none;
+   cursor: pointer;
+   transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.button-group button:hover {
+   background-color: #2f5d86;
+}
+
+.button-group button:active {
+   transform: scale(0.97);
+}
+
+.calc-category {
+   display: flex;
+   flex-direction: column;
+   gap: 12px;
+}
+
+.calc-card {
+   display: flex;
+   flex-direction: column;
+   gap: 8px;
+   padding: 14px 18px 18px;
+   border-radius: 8px;
+   border: 1px solid #ccc;
+   background-color: #e0ffff;
+   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.calc-card-header {
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   border-bottom: 2px solid #234461;
+   padding-bottom: 6px;
+   margin-bottom: 4px;
+   font-weight: bold;
+   color: #234461;
+}
+
+.calc-card label {
+   display: flex;
+   flex-direction: column;
+   gap: 4px;
+   font-weight: bold;
+   font-size: 14px;
+}
+
+.calc-card input,
+.calc-card select {
+   padding: 6px 8px;
+   border-radius: 4px;
+   border: 1px solid #ccc;
+   font-size: 14px;
+   font-family: inherit;
+}
+
+.removeEntryBtn {
+   width: 24px;
+   height: 24px;
+   line-height: 1;
+   border: none;
+   border-radius: 50%;
+   background-color: #d64545;
+   color: #ffffff;
+   font-size: 15px;
+   cursor: pointer;
+   flex-shrink: 0;
+   transition: background-color 0.15s ease;
+}
+
+.removeEntryBtn:hover {
+   background-color: #b33333;
+}
+
+.deductions-wrap,
+.pensions-list {
+   display: flex;
+   flex-direction: column;
+   gap: 6px;
+}
+
+.deductions-heading {
+   font-weight: bold;
+   font-size: 13px;
+   color: #234461;
+}
+
+.deduction-row,
+.pension-row {
+   display: flex;
+   gap: 8px;
+   align-items: center;
+}
+
+.deduction-row input,
+.pension-row input {
+   flex: 1;
+   padding: 6px 8px;
+   border-radius: 4px;
+   border: 1px solid #ccc;
+   font-size: 14px;
+   font-family: inherit;
+}
+
+.addOtherBtn {
+   align-self: flex-start;
+   padding: 6px 14px;
+   border-radius: 5px;
+   font-size: 13px;
+   font-weight: bold;
+   background-color: #234461;
+   color: #ffffff;
+   border: none;
+   cursor: pointer;
+   transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.addOtherBtn:hover {
+   background-color: #2f5d86;
+}
+
+.addOtherBtn:active {
+   transform: scale(0.97);
+}
+
+.computed-line {
+   margin: 0;
+   padding: 8px 10px;
+   border-radius: 4px;
+   background-color: #fffacd;
+   border: 1px solid #e0c260;
+   font-size: 14px;
+   font-weight: bold;
+   color: #234461;
+}
+
+.push-summary-box {
+   padding: 15px 20px;
+   border-radius: 8px;
+   border: 1px solid #234461;
+   background-color: #fffacd;
+   font-size: 14px;
+   color: #234461;
+}
+
+.push-summary-box strong {
+   display: block;
+   margin-bottom: 8px;
+}
+
+.push-summary-box p {
+   margin: 2px 0;
+}
+
+.submitRow {
+   display: flex;
+   align-items: center;
+   gap: 12px;
+   justify-content: center;
+}
+
+#submitIncomeCalculationsBtn {
+   padding: 10px 18px;
+   border-radius: 5px;
+   font-size: 15px;
+   font-weight: bold;
+   background-color: #234461;
+   color: #ffffff;
+   border: none;
+   cursor: pointer;
+   transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+#submitIncomeCalculationsBtn:hover {
+   background-color: #2f5d86;
+}
+
+#submitIncomeCalculationsBtn:active {
+   transform: scale(0.97);
+}
+
+#submitStatus.success {
+   color: #1a7a1a;
+   font-weight: bold;
+}
+
+#submitStatus.error {
+   color: #b33333;
+   font-weight: bold;
+}

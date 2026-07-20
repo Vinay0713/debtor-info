@@ -1,0 +1,139 @@
+html, body {
+   font-family: Arial, sans-serif;
+   background-color: #f0ffff;
+   margin: 0;
+   padding: 0;
+   color: #000000;
+}
+
+h1 {
+   text-align: center;
+   margin-top: 0;
+   padding: 30px;
+   color: #234461;
+   background-color: #e0ffff;
+   border-style: inset;
+}
+
+.questionnaire-info {
+   max-width: 700px;
+   margin: 40px auto;
+   padding: 10px 20px 40px;
+   display: flex;
+   flex-direction: column;
+   gap: 20px;
+}
+
+.section-note {
+   padding: 12px 14px;
+   border-radius: 6px;
+   border: 1px solid #e0c260;
+   background-color: #fffacd;
+}
+
+.section-note h4 {
+   margin: 0 0 8px;
+   color: #234461;
+   font-size: 14px;
+}
+
+.section-note p {
+   margin: 4px 0;
+   font-size: 13px;
+   line-height: 1.5;
+}
+
+.question-block {
+   display: flex;
+   flex-direction: column;
+   gap: 10px;
+   padding: 15px 20px 20px;
+   border-radius: 8px;
+   border: 1px solid #ccc;
+   background-color: #e0ffff;
+   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.entry-header {
+   border-bottom: 2px solid #234461;
+   padding-bottom: 6px;
+   margin-bottom: 4px;
+}
+
+.entry-header h3 {
+   margin: 0;
+   color: #234461;
+   font-size: 17px;
+}
+
+.radio-group {
+   display: flex;
+   gap: 24px;
+}
+
+.radio-group label {
+   display: flex;
+   align-items: center;
+   gap: 6px;
+   font-weight: bold;
+   font-size: 14px;
+}
+
+.radio-group input[type="radio"] {
+   width: 16px;
+   height: 16px;
+}
+
+.detail-textarea {
+   display: flex;
+   flex-direction: column;
+   gap: 4px;
+   font-weight: bold;
+   font-size: 14px;
+}
+
+.detail-textarea textarea {
+   padding: 8px 10px;
+   border-radius: 4px;
+   border: 1px solid #ccc;
+   font-size: 14px;
+   font-family: inherit;
+   resize: vertical;
+}
+
+.submitRow {
+   display: flex;
+   align-items: center;
+   gap: 12px;
+   justify-content: center;
+}
+
+#submitQuestionnaireBtn {
+   padding: 10px 18px;
+   border-radius: 5px;
+   font-size: 15px;
+   font-weight: bold;
+   background-color: #234461;
+   color: #ffffff;
+   border: none;
+   cursor: pointer;
+   transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+#submitQuestionnaireBtn:hover {
+   background-color: #2f5d86;
+}
+
+#submitQuestionnaireBtn:active {
+   transform: scale(0.97);
+}
+
+#submitStatus.success {
+   color: #1a7a1a;
+   font-weight: bold;
+}
+
+#submitStatus.error {
+   color: #b33333;
+   font-weight: bold;
+}

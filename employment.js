@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const card = clone.querySelector(".entry-card");
             const removeBtn = card.querySelector(".removeEntryBtn");
             removeBtn.addEventListener("click", () => card.remove());
-            container.appendChild(clone);
+            container.prepend(clone);
         });
     }
 
@@ -31,6 +31,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     wireEntryButton("retiredBtn", "retiredTemplate", "retiredContainer");
     wireEntryButton("disabledBtn", "disabledTemplate", "disabledContainer");
     wireEntryButton("selfEmployedBtn", "selfEmployedTemplate", "selfEmployedContainer");
+    wireEntryButton("benefitsBtn", "benefitsTemplate", "benefitsContainer");
 
     function collectEntries(containerId) {
         return Array.from(document.querySelectorAll(`#${containerId} .entry-card`)).map((card) => {
@@ -52,6 +53,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             retired: collectEntries("retiredContainer"),
             disabled: collectEntries("disabledContainer"),
             selfEmployed: collectEntries("selfEmployedContainer"),
+            benefits: collectEntries("benefitsContainer"),
         };
 
         submitStatus.textContent = "Submitting...";
