@@ -1,2 +1,7 @@
 node_modules/
 data.json
+users.json
+sessions.json
+pg/
+uploads/
+*.log

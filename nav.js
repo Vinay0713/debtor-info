@@ -9,6 +9,7 @@
     { label: "Questionnaire", href: "questionnaire.html", requires: "liabilitiesSubmitted" },
     { label: "Income", href: "income.html", requires: "questionnaireSubmitted" },
     { label: "Expenses", href: "expenses.html", requires: "incomeSubmitted" },
+    { label: "Documents", href: "documents.html", requires: "expensesSubmitted" },
     { label: "Summary", href: "summary.html", requires: "expensesSubmitted" },
   ];
 
@@ -17,7 +18,7 @@
     return path === "" ? "index.html" : path;
   }
 
-  function render(status) {
+  function render(status, authInfo) {
     const container = document.getElementById("navPlaceholder");
     if (!container) return;
 
@@ -41,17 +42,39 @@
       nav.appendChild(el);
     });
 
+    if (authInfo && authInfo.loggedIn) {
+      const userInfo = document.createElement("span");
+      userInfo.className = "nav-user";
+      userInfo.textContent = authInfo.email;
+      nav.appendChild(userInfo);
+
+      const logoutBtn = document.createElement("button");
+      logoutBtn.type = "button";
+      logoutBtn.className = "nav-logout";
+      logoutBtn.textContent = "Log Out";
+      logoutBtn.addEventListener("click", async () => {
+        try {
+          await fetch("/api/auth/logout", { method: "POST" });
+        } catch (err) {
+          // Ignore network errors; redirect to login regardless.
+        }
+        window.location.href = "/login.html";
+      });
+      nav.appendChild(logoutBtn);
+    }
+
     container.innerHTML = "";
     container.appendChild(nav);
   }
 
   async function refresh() {
     try {
-      const res = await fetch("/api/status");
-      const status = await res.json();
-      render(status);
+      const [statusRes, meRes] = await Promise.all([fetch("/api/status"), fetch("/api/auth/me")]);
+      const status = await statusRes.json();
+      const authInfo = await meRes.json();
+      render(status, authInfo);
     } catch (err) {
-      render({ personalSubmitted: false, employmentSubmitted: false });
+      render({ personalSubmitted: false, employmentSubmitted: false }, null);
     }
   }
 

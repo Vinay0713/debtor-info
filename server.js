@@ -3,7 +3,10 @@ const fs = require("fs");
 const crypto = require("crypto");
 const express = require("express");
 const cookieParser = require("cookie-parser");
+const bcrypt = require("bcryptjs");
+const { Pool } = require("pg");
 const PDFDocument = require("pdfkit");
+const createDocumentsRouter = require("./documents-router");
 const {
   PERSONAL_FIELD_LABELS,
   EMPLOYMENT_CATEGORY_LABELS,
@@ -32,8 +35,15 @@ const {
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const DATA_FILE = path.join(__dirname, "data.json");
+const DATA_FILE = process.env.DATA_FILE || path.join(__dirname, "data.json");
 const SESSION_COOKIE = "sessionId";
+// DATABASE_URL (set by Render's managed Postgres) takes priority; otherwise
+// falls back to PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDATABASE, which is how the
+// portable local Postgres used for office-server/dev deployments is configured.
+const pool = process.env.DATABASE_URL
+  ? new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } })
+  : new Pool();
+const SESSION_MAX_AGE_MS = 90 * 24 * 60 * 60 * 1000; // 90 days
 const EMPTY_SESSION = {
   personal: null,
   employment: null,
@@ -59,39 +69,170 @@ function writeStore(store) {
   fs.writeFileSync(DATA_FILE, JSON.stringify(store, null, 2));
 }
 
+// Filing data is keyed by the logged-in user's email, not an anonymous cookie,
+// so a case follows the account across browsers/devices.
 function getSessionData(req) {
   const store = readStore();
-  return store.sessions[req.sessionId] || EMPTY_SESSION;
+  return store.sessions[req.userId] || EMPTY_SESSION;
 }
 
 function updateSessionData(req, patch) {
   const store = readStore();
-  const current = store.sessions[req.sessionId] || EMPTY_SESSION;
-  store.sessions[req.sessionId] = { ...current, ...patch };
+  const current = store.sessions[req.userId] || EMPTY_SESSION;
+  store.sessions[req.userId] = { ...current, ...patch };
   writeStore(store);
-  return store.sessions[req.sessionId];
+  return store.sessions[req.userId];
+}
+
+// Reads a case's Personal Info straight out of data.json for the documents
+// router (kept here so documents.js doesn't need to know about DATA_FILE).
+function getPersonalInfoFor(userId) {
+  const store = readStore();
+  return (store.sessions[userId] && store.sessions[userId].personal) || {};
+}
+
+async function initSchema() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS users (
+      email TEXT PRIMARY KEY,
+      password_hash TEXT NOT NULL,
+      folder_name TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS sessions (
+      session_id UUID PRIMARY KEY,
+      user_email TEXT NOT NULL REFERENCES users(email) ON DELETE CASCADE,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS documents (
+      id SERIAL PRIMARY KEY,
+      user_email TEXT NOT NULL REFERENCES users(email) ON DELETE CASCADE,
+      category TEXT NOT NULL,
+      original_filename TEXT NOT NULL,
+      stored_filename TEXT NOT NULL,
+      uploaded_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `);
+}
+
+function isValidEmail(email) {
+  return typeof email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// Creates a session record and sets the cookie that identifies it. Called on
+// successful signup or login.
+async function startSession(res, userId) {
+  const sessionId = crypto.randomUUID();
+  await pool.query("INSERT INTO sessions (session_id, user_email) VALUES ($1, $2)", [sessionId, userId]);
+  res.cookie(SESSION_COOKIE, sessionId, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.COOKIE_SECURE === "true",
+    maxAge: SESSION_MAX_AGE_MS,
+  });
 }
 
 app.use(express.json());
 app.use(cookieParser());
 
-// Assigns a per-browser session cookie (no maxAge, so it clears when the
-// browser closes) so each browser session sees only its own submissions.
-app.use((req, res, next) => {
-  let sessionId = req.cookies[SESSION_COOKIE];
-  if (!sessionId) {
-    sessionId = crypto.randomUUID();
-    res.cookie(SESSION_COOKIE, sessionId, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-    });
+// Resolves the logged-in user (if any) from the session cookie. Does not
+// block anything by itself — the gate below decides what requires login.
+app.use(async (req, res, next) => {
+  const sessionId = req.cookies[SESSION_COOKIE];
+  if (sessionId) {
+    try {
+      const result = await pool.query("SELECT user_email FROM sessions WHERE session_id = $1", [sessionId]);
+      if (result.rows.length > 0) {
+        req.sessionId = sessionId;
+        req.userId = result.rows[0].user_email;
+      }
+    } catch (err) {
+      console.error("Session lookup failed:", err.message);
+    }
   }
-  req.sessionId = sessionId;
   next();
 });
 
+// Pages/requests reachable without being logged in.
+const PUBLIC_PAGE_PATHS = new Set(["/login.html", "/signup.html", "/login.js", "/signup.js", "/style.css"]);
+
+// Every other page and API route requires login. API requests get a 401 (the
+// page JS already expects JSON from fetch); page loads get redirected to the
+// login page.
+app.use((req, res, next) => {
+  if (req.userId) return next();
+  if (req.path.startsWith("/api/auth/")) return next();
+  if (PUBLIC_PAGE_PATHS.has(req.path)) return next();
+  if (req.path.startsWith("/api/")) {
+    return res.status(401).json({ ok: false, error: "Not authenticated" });
+  }
+  return res.redirect("/login.html");
+});
+
 app.use(express.static(__dirname));
+
+app.use("/api/documents", createDocumentsRouter(pool, getPersonalInfoFor));
+
+app.post("/api/auth/signup", async (req, res) => {
+  const email = String((req.body && req.body.email) || "").trim().toLowerCase();
+  const password = String((req.body && req.body.password) || "");
+
+  if (!isValidEmail(email)) {
+    return res.status(400).json({ ok: false, error: "Please enter a valid email address." });
+  }
+  if (password.length < 8) {
+    return res.status(400).json({ ok: false, error: "Password must be at least 8 characters." });
+  }
+
+  try {
+    const passwordHash = bcrypt.hashSync(password, 10);
+    await pool.query("INSERT INTO users (email, password_hash) VALUES ($1, $2)", [email, passwordHash]);
+  } catch (err) {
+    if (err.code === "23505") {
+      return res.status(409).json({ ok: false, error: "An account with this email already exists." });
+    }
+    console.error("Signup failed:", err.message);
+    return res.status(500).json({ ok: false, error: "Sign up failed. Please try again." });
+  }
+
+  await startSession(res, email);
+  res.json({ ok: true });
+});
+
+app.post("/api/auth/login", async (req, res) => {
+  const email = String((req.body && req.body.email) || "").trim().toLowerCase();
+  const password = String((req.body && req.body.password) || "");
+
+  try {
+    const result = await pool.query("SELECT password_hash FROM users WHERE email = $1", [email]);
+    const user = result.rows[0];
+    if (!user || !bcrypt.compareSync(password, user.password_hash)) {
+      return res.status(401).json({ ok: false, error: "Invalid email or password." });
+    }
+  } catch (err) {
+    console.error("Login failed:", err.message);
+    return res.status(500).json({ ok: false, error: "Login failed. Please try again." });
+  }
+
+  await startSession(res, email);
+  res.json({ ok: true });
+});
+
+app.post("/api/auth/logout", async (req, res) => {
+  if (req.sessionId) {
+    await pool.query("DELETE FROM sessions WHERE session_id = $1", [req.sessionId]);
+  }
+  res.clearCookie(SESSION_COOKIE);
+  res.json({ ok: true });
+});
+
+app.get("/api/auth/me", (req, res) => {
+  res.json({ loggedIn: Boolean(req.userId), email: req.userId || null });
+});
 
 app.get("/api/status", (req, res) => {
   const data = getSessionData(req);
@@ -634,6 +775,13 @@ app.get("/api/pdf", (req, res) => {
   doc.end();
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-});
+initSchema()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running at http://localhost:${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Failed to connect to Postgres / initialize schema:", err.message);
+    process.exit(1);
+  });

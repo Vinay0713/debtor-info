@@ -1,0 +1,311 @@
+================================================================================
+INSTALLING THE BANKRUPTCY INTAKE APP ON THE OFFICE SERVER
+================================================================================
+Follow these steps IN ORDER, on the actual office server machine (the same
+Windows Server that hosts your share drive, per our earlier discussion - not
+this development desktop). Everything here is meant to be typed/run directly
+on that server.
+
+Total time: roughly 30-45 minutes, most of it waiting on downloads.
+
+
+================================================================================
+STEP 0 - WHAT YOU'RE INSTALLING (read this first)
+================================================================================
+
+Three things end up running on the server:
+  1. Node.js          - runs the actual web app (server.js)
+  2. PostgreSQL        - a portable, no-admin-install copy, used only for
+                          login accounts and uploaded-document records
+  3. The app itself    - this project's files
+
+Nothing here needs to be a Windows Service. Instead, two small scripts start
+everything (pg\start.ps1 for the database, start.ps1 for the app), and Step 8
+below sets those to run automatically every time the server restarts.
+
+
+================================================================================
+STEP 1 - INSTALL NODE.JS (one-time, needs admin rights)
+================================================================================
+
+1. On the server, open a browser and go to: https://nodejs.org
+2. Download the "LTS" version for Windows (the recommended one, not
+   "Current").
+3. Run the installer. Accept the defaults. This does need an admin/UAC
+   prompt - it's a normal one-time software install, unlike everything else
+   in this guide.
+4. Open a NEW PowerShell window (so it picks up the updated PATH) and check
+   it worked:
+
+       node --version
+       npm --version
+
+   Both should print a version number, e.g. v22.x.x and 10.x.x.
+
+
+================================================================================
+STEP 2 - COPY THE APP FILES TO THE SERVER
+================================================================================
+
+Copy the entire project folder from this development machine
+(C:\Users\Vinay\OneDrive\Documents\Project\HTML) to the server - e.g. onto a
+USB drive, over the office network, or via whatever method you normally move
+files between machines. Put it wherever you want the app to live long-term,
+for example:
+
+       C:\Apps\bankruptcy-intake\
+
+AFTER copying, delete the following from the COPY on the server - these are
+either development-only files or leftovers from an unrelated earlier project
+and should not go to the server:
+
+       .env
+       .env.example
+       README-CustomerFormBuilder.md
+       ecosystem.customerformbuilder.config.js
+       legacy-standalone\        (whole folder)
+       loadtest\                 (whole folder)
+       public\                   (whole folder)
+       server\                   (whole folder - unrelated leftover code,
+                                   NOT the same thing as server.js)
+       data\                     (whole folder, if present)
+       node_modules\             (whole folder - will be reinstalled fresh)
+       pg\                       (whole folder - will be set up fresh on the
+                                   server in Step 4, don't reuse this
+                                   machine's copy)
+       data.json, users.json, sessions.json   (this machine's test data -
+                                   the server should start with a clean slate)
+       server-out.log, server-err.log
+       Pwo_pwi.html               (empty, unused file)
+
+What's LEFT after deleting those is the actual app: all the .html/.css/.js
+page files, server.js, documents-router.js, field-labels.js,
+field-labels.browser.js, package.json, package-lock.json, .gitignore, and
+start.ps1.
+
+(If you'd rather use git: this project has a GitHub remote already
+configured. You could push the cleaned-up code there and "git clone" it on
+the server instead of copying files by hand. Only do this if you're
+comfortable with git - file copying is simpler and just as correct.)
+
+
+================================================================================
+STEP 3 - INSTALL THE APP'S DEPENDENCIES
+================================================================================
+
+Open PowerShell, go to the folder you copied, and run:
+
+       cd C:\Apps\bankruptcy-intake
+       npm install
+
+This downloads the small libraries the app needs (Express, bcryptjs, pg,
+multer, pdfkit, etc.) into a new node_modules folder. Takes under a minute.
+
+
+================================================================================
+STEP 4 - SET UP THE PORTABLE POSTGRESQL DATABASE
+================================================================================
+
+This mirrors exactly what was done on the development machine - a portable,
+no-installer copy of Postgres that runs as a plain background process, no
+admin rights and no Windows Service needed.
+
+4a. Download the binaries (this is a ~330MB file, give it a few minutes):
+
+       mkdir C:\Apps\bankruptcy-intake\pg
+       cd C:\Apps\bankruptcy-intake\pg
+       curl.exe -L -o postgres-binaries.zip https://get.enterprisedb.com/postgresql/postgresql-18.6-3-windows-x64-binaries.zip
+
+    (If that exact link has gone stale by the time you read this, go to
+    https://www.enterprisedb.com/download-postgresql-binaries and grab the
+    current Windows x86-64 ZIP instead - same idea, different version number.)
+
+4b. Extract it:
+
+       Expand-Archive -Path postgres-binaries.zip -DestinationPath extracted
+
+    You should end up with C:\Apps\bankruptcy-intake\pg\extracted\pgsql
+    containing a "bin" folder with initdb.exe, pg_ctl.exe, psql.exe, etc.
+
+4c. Initialize the database (creates the data files, one time only):
+
+       .\extracted\pgsql\bin\initdb.exe -D .\data -U postgres -A trust -E UTF8
+
+    "-A trust" means no password is required for local connections - safe
+    here because this database only ever listens on 127.0.0.1 (never the
+    network), so nothing outside this machine can reach it anyway.
+
+4d. Tune it down for a small, low-traffic app (optional but recommended -
+    keeps memory use light). Open pg\data\postgresql.conf in Notepad and
+    change these two lines:
+
+       max_connections = 20          (default was 100)
+       shared_buffers = 32MB         (default was 128MB)
+
+4e. Create the two helper scripts. In C:\Apps\bankruptcy-intake\pg, create
+    start.ps1 with this content:
+
+       $here = Split-Path -Parent $MyInvocation.MyCommand.Path
+       $bin = Join-Path $here "extracted\pgsql\bin"
+       $data = Join-Path $here "data"
+       $log = Join-Path $here "logfile"
+       & "$bin\pg_ctl.exe" -D "$data" -l "$log" start
+
+    And stop.ps1 with this content:
+
+       $here = Split-Path -Parent $MyInvocation.MyCommand.Path
+       $bin = Join-Path $here "extracted\pgsql\bin"
+       $data = Join-Path $here "data"
+       & "$bin\pg_ctl.exe" -D "$data" stop
+
+    (These are identical to the ones already sitting in pg\ if you copied
+    that folder structure - if you deleted pg\ per Step 2, recreate them
+    here now.)
+
+4f. Start Postgres and create the application database:
+
+       powershell -ExecutionPolicy Bypass -File .\start.ps1
+       .\extracted\pgsql\bin\createdb.exe -U postgres -h 127.0.0.1 -p 5432 bankruptcy_app
+
+    Verify it worked:
+
+       .\extracted\pgsql\bin\psql.exe -U postgres -h 127.0.0.1 -p 5432 -l
+
+    You should see "bankruptcy_app" in the list of databases.
+
+
+================================================================================
+STEP 5 - CONFIGURE AND START THE APP
+================================================================================
+
+5a. Decide where uploaded documents should be saved. If this server also
+    hosts your share drive, point it directly at that share's folder, e.g.
+    D:\Shares\BankruptcyCases. Create that folder if it doesn't exist yet.
+
+5b. Open C:\Apps\bankruptcy-intake\start.ps1 in Notepad and check/edit it so
+    it looks like this (add the DOCS_ROOT line if it isn't already there):
+
+       $env:PGHOST = "127.0.0.1"
+       $env:PGPORT = "5432"
+       $env:PGUSER = "postgres"
+       $env:PGDATABASE = "bankruptcy_app"
+       $env:DOCS_ROOT = "D:\Shares\BankruptcyCases"
+
+       Set-Location -Path (Split-Path -Parent $MyInvocation.MyCommand.Path)
+       node server.js
+
+5c. Start the app:
+
+       cd C:\Apps\bankruptcy-intake
+       powershell -ExecutionPolicy Bypass -File .\start.ps1
+
+    You should see: "Server running at http://localhost:3000"
+    Leave this PowerShell window open, or see Step 8 for running it
+    invisibly in the background permanently.
+
+5d. From the SAME server, open a browser and check http://localhost:3000 -
+    it should redirect you to the login page.
+
+
+================================================================================
+STEP 6 - OPEN THE FIREWALL SO OTHER COMPUTERS CAN REACH IT
+================================================================================
+
+Run this once, in an Administrator PowerShell window, on the server:
+
+       netsh advfirewall firewall add rule name="Bankruptcy Intake App" dir=in action=allow protocol=TCP localport=3000
+
+Then from a DIFFERENT computer on the office network, browse to:
+
+       http://<server's-LAN-IP>:3000
+
+(Find the server's LAN IP by running "ipconfig" on the server itself and
+looking for the IPv4 Address on the network adapter it actually uses.)
+
+
+================================================================================
+STEP 7 - (OPTIONAL) POINT A FRIENDLY DOMAIN NAME AT IT
+================================================================================
+
+If you've bought a domain for this, add an A record at your registrar:
+    Host:  whatever subdomain you want, e.g. "intake"
+    Value: the server's LAN IP from Step 6
+
+Then everyone on the office network can use:
+    http://intake.yourfirm.com:3000
+instead of typing the raw IP address. (The ":3000" stays, since this setup
+doesn't use port 80 - see our earlier conversation if you want that changed,
+it's a bigger step requiring admin-level port binding.)
+
+
+================================================================================
+STEP 8 - MAKE IT SURVIVE A SERVER REBOOT
+================================================================================
+
+Neither Postgres nor the app is installed as a Windows Service, so after any
+server restart, both need to be started again. The easiest way to automate
+that without needing a Windows Service is a Scheduled Task that runs "At
+startup":
+
+1. Open Task Scheduler (search for it in the Start menu).
+2. Click "Create Task..." (not "Create Basic Task").
+3. General tab: Name it "Start Bankruptcy Intake Postgres". Under
+   "Security options", choose "Run whether user is logged on or not", and
+   check "Run with highest privileges".
+4. Triggers tab: New... -> "At startup".
+5. Actions tab: New... -> Action "Start a program" -> Program/script:
+   powershell.exe -> Add arguments:
+       -ExecutionPolicy Bypass -File "C:\Apps\bankruptcy-intake\pg\start.ps1"
+6. Save it (it'll ask for the account password once).
+7. Repeat steps 2-6 for a second task, "Start Bankruptcy Intake App", same
+   trigger, but with Add arguments:
+       -ExecutionPolicy Bypass -File "C:\Apps\bankruptcy-intake\start.ps1"
+   Make sure this second task is set to start a minute or two AFTER the
+   first one (Task Scheduler lets you add a delay under the trigger's
+   "Advanced settings") so Postgres is already up before the app tries to
+   connect to it.
+
+
+================================================================================
+STEP 9 - BACK UP THE DATA REGULARLY
+================================================================================
+
+The one thing on this server that ISN'T easily replaced if lost is the data
+people have entered. Back up these two things on whatever schedule your
+office normally uses for backups:
+
+  1. C:\Apps\bankruptcy-intake\data.json
+        - every bankruptcy filing answer for every case.
+  2. The Postgres data folder, C:\Apps\bankruptcy-intake\pg\data
+        - or more simply, just back up a fresh export instead of the raw
+          files:
+              cd C:\Apps\bankruptcy-intake\pg
+              .\extracted\pgsql\bin\pg_dump.exe -U postgres -h 127.0.0.1 -p 5432 bankruptcy_app > backup.sql
+        - this gives you a single backup.sql file you can restore from.
+
+Uploaded documents already live directly on your share drive (Step 5a), so
+they ride along with whatever backup policy already covers that share -
+nothing extra needed there.
+
+
+================================================================================
+STEP 10 - VERIFICATION CHECKLIST
+================================================================================
+
+[ ] node --version and npm --version both work
+[ ] pg\start.ps1 runs with no errors, and psql -l shows bankruptcy_app
+[ ] start.ps1 prints "Server running at http://localhost:3000"
+[ ] Visiting http://localhost:3000 on the server redirects to the login page
+[ ] Signing up a test account and logging back in works
+[ ] Visiting http://<server-LAN-IP>:3000 from a different office computer works
+[ ] Uploading a test document on the Documents page creates a folder under
+    the path set in DOCS_ROOT, named after the test account's name
+[ ] Both Scheduled Tasks from Step 8 show up in Task Scheduler and are
+    enabled
+[ ] A restart of the server brings both Postgres and the app back up on
+    their own, with no manual steps
+
+Once every box is checked, the office server install is complete.
+================================================================================
+END OF DOCUMENT
+================================================================================

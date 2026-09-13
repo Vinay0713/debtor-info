@@ -32,6 +32,29 @@ a.nav-tab:hover {
   cursor: not-allowed;
 }
 
+.nav-user {
+  align-self: center;
+  padding: 8px 12px;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.nav-logout {
+  padding: 8px 16px;
+  border-radius: 5px;
+  font-size: 15px;
+  font-weight: bold;
+  background-color: transparent;
+  color: #ffffff;
+  border: 1px solid #ffffff;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.nav-logout:hover {
+  background-color: #2f5d86;
+}
+
 .gate-notice {
   max-width: 480px;
   margin: 60px auto;

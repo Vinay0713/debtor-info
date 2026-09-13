@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign Up</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+  <h1>Sign Up</h1>
+
+  <form id="signupForm" class="form-wrapper">
+    <label>Email:
+      <input type="email" name="email" required autocomplete="email" />
+    </label>
+    <label>Password:
+      <input type="password" name="password" minlength="8" required autocomplete="new-password" />
+    </label>
+    <label>Confirm Password:
+      <input type="password" name="confirmPassword" minlength="8" required autocomplete="new-password" />
+    </label>
+
+    <div class="submitRow">
+      <button type="submit" id="signupBtn">Sign Up</button>
+      <span id="submitStatus"></span>
+    </div>
+
+    <p class="hint">Already have an account? <a href="login.html">Log in</a></p>
+  </form>
+
+  <script src="signup.js"></script>
+</body>
+</html>

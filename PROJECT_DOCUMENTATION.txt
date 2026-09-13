@@ -1,0 +1,785 @@
+================================================================================
+BANKRUPTCY INTAKE APP - COMPLETE FILE-BY-FILE DOCUMENTATION
+================================================================================
+This file explains, in plain English, what every HTML, CSS, and JavaScript
+file in this project does - both in the browser (frontend) and on the server
+(backend) - plus how the Postgres database and file uploads fit in.
+
+Location: C:\Users\Vinay\OneDrive\Documents\Project\HTML
+
+
+================================================================================
+1. THE BIG PICTURE
+================================================================================
+
+This is a multi-page web form that collects everything needed to file for
+personal bankruptcy: personal details, employment, income, assets, debts,
+a questionnaire, expenses, and supporting documents - then produces a PDF
+summary of everything.
+
+How it fits together:
+  - Each "page" of the form is its own HTML file (index.html, employment.html,
+    assets.html, etc.), each with its own CSS file for styling and its own
+    JS file for behavior.
+  - A single Node.js server (server.js) serves all these files and exposes a
+    JSON API (/api/...) that the pages talk to via fetch() calls.
+  - The server keeps two kinds of data:
+      1. Login accounts and uploaded-document records -> stored in a real
+         Postgres database (tables: users, sessions, documents).
+      2. The actual bankruptcy filing answers (personal info, employment,
+         assets, etc.) -> stored in a single JSON file, data.json, one entry
+         per user account.
+  - Nobody can see or use any page until they log in. Once logged in, the
+    pages must also be completed in order (you can't jump to Assets before
+    finishing Employment) - that's a second, separate "gate" layered on top
+    of the login gate.
+  - Uploaded documents (paystubs, IDs, valuations, etc.) are saved to a
+    folder on disk named after the client (e.g. "Wonder_Alice"), and tracked
+    in the documents table so the app knows what's already been uploaded.
+
+
+================================================================================
+2. THE BACKEND (server.js and friends)
+================================================================================
+
+--------------------------------------------------------------------------
+2.1 server.js - the one Node/Express server that runs everything
+--------------------------------------------------------------------------
+
+Top of the file: pulls in Node's built-in "path", "fs" (file system), and
+"crypto" modules, plus three libraries - "express" (the web server
+framework), "cookie-parser" (reads cookies off incoming requests),
+"bcryptjs" (hashes and checks passwords), "pg" (talks to Postgres),
+"pdfkit" (draws PDF files) - and two of this project's own files:
+field-labels.js (a giant dictionary of "field name" -> "human-readable
+label", used only for the PDF) and documents-router.js (the separate
+router file that handles document uploads, explained in section 2.2).
+
+Setup constants: picks the port to listen on (from the PORT environment
+variable, or 3000 by default), works out the full path to data.json, names
+the cookie the app uses ("sessionId"), decides a session should last 90
+days, and creates a "Pool" - a reusable connection to the Postgres
+database. The Pool doesn't need a password or host typed into the code;
+it automatically reads PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDATABASE from
+whatever environment variables were set before the server was started
+(that's what start.ps1 does).
+
+EMPTY_SESSION: a template object with every form section (personal,
+employment, incomeCalculations, spouseOtherMember, assets, liabilities,
+questionnaire, income, expenses) set to null - what a brand-new user's
+filing data looks like before they've filled in anything.
+
+readStore() / writeStore(): read the whole of data.json into memory and
+parse it as JSON (or return an empty { sessions: {} } if the file is
+missing or broken), and write a JavaScript object back out to that file
+as nicely-formatted JSON.
+
+getSessionData(req) / updateSessionData(req, patch): look up (or merge
+new answers into) the current logged-in user's filing record inside
+data.json. Note that the record is keyed by the user's email address
+(req.userId), not by an anonymous cookie - so if someone logs in from a
+different computer, their in-progress filing is still there.
+
+getPersonalInfoFor(userId): a small helper just for documents-router.js -
+looks up one user's Personal Info answers directly, so the documents
+feature can build a folder name like "Wonder_Alice" without needing to
+know how data.json is structured itself.
+
+initSchema(): runs three "CREATE TABLE IF NOT EXISTS" statements against
+Postgres every time the server starts - for "users" (email, password
+hash, the folder name assigned to them, when they signed up), "sessions"
+(a random session ID, which user it belongs to, when it was created), and
+"documents" (which user uploaded it, what category it's filed under, its
+original and saved-on-disk file names, when it was uploaded). Because
+this uses "IF NOT EXISTS", it's safe to run every single time the server
+starts - it only creates the tables the very first time.
+
+isValidEmail(email): a one-line regex check that a string roughly looks
+like an email address (something@something.something).
+
+startSession(res, userId): called right after someone signs up or logs
+in successfully. Generates a random, unguessable session ID
+(crypto.randomUUID()), saves a row in the sessions table linking that ID
+to the user's email, and sets it as a cookie on the response - httpOnly
+(JavaScript in the browser can't read it, which blocks a whole class of
+attack), sameSite "lax" (blocks it being sent on most cross-site
+requests), "secure" only if the COOKIE_SECURE environment variable is
+literally the text "true" (left off by default because this runs over
+plain HTTP on an internal network), and set to expire in 90 days.
+
+app.use(express.json()): every incoming request with a JSON body gets
+automatically parsed, so route handlers can just read req.body.
+
+app.use(cookieParser()): every incoming request's cookies get parsed into
+req.cookies.
+
+The "who is this?" middleware: runs on every single request. Reads the
+sessionId cookie; if there is one, looks it up in the sessions table; if
+that session exists, remembers req.sessionId and req.userId for the rest
+of this request. If there's no cookie, or the session doesn't exist
+(expired, logged out, or just made up), it does nothing - req.userId
+stays unset, meaning "not logged in".
+
+PUBLIC_PAGE_PATHS: a short list of the only things a NOT-logged-in visitor
+is allowed to reach: the login and signup pages themselves, their two JS
+files, and the shared style.css (so the login/signup forms don't look
+broken).
+
+The "are you allowed here?" middleware: runs right after the one above,
+on every request. If req.userId was set (i.e. they're logged in), let the
+request through. If the URL starts with /api/auth/ (login, signup,
+logout, "who am I"), let it through - those have to be reachable by
+someone who ISN'T logged in yet. If the exact path is one of the public
+pages above, let it through. Otherwise: if the URL starts with /api/,
+reply with a 401 "Not authenticated" JSON error (because the page's own
+JavaScript is expecting JSON back, not a redirect); for anything else -
+any of the actual form pages - redirect the browser straight to
+login.html. This is a "deny by default" design: anything not explicitly
+allowed gets blocked, which is the safer way round.
+
+app.use(express.static(__dirname)): after the two checks above, actually
+serve whatever static file was asked for (an .html, .css, or .js file)
+straight from this folder.
+
+app.use("/api/documents", ...): hands off every request starting with
+/api/documents to the separate router built in documents-router.js
+(explained below), giving it the shared database Pool and the
+getPersonalInfoFor helper to use.
+
+POST /api/auth/signup: reads email and password out of the request,
+lower-cases and trims the email. Rejects with a 400 error if the email
+doesn't look valid or the password is under 8 characters. Otherwise
+hashes the password with bcrypt and tries to INSERT a new row into the
+users table. If Postgres rejects the insert because that email is already
+taken (error code 23505 = "unique constraint violation"), it replies with
+a friendly 409 "account already exists" message instead of a scary
+generic error. If it succeeds, it calls startSession (logging the new
+user in immediately) and replies { ok: true }.
+
+POST /api/auth/login: reads email and password, looks up the stored
+password hash for that email, and uses bcrypt to check the submitted
+password against it. If the email doesn't exist, or the password is
+wrong, it replies with a 401 "Invalid email or password" - deliberately
+the SAME message either way, so an attacker can't tell whether an email
+is registered just from the error text. If it matches, starts a session
+and replies { ok: true }.
+
+POST /api/auth/logout: if there's a current session, deletes that row
+from the sessions table (so the cookie becomes useless even if someone
+kept a copy of it), clears the cookie on the browser, and replies
+{ ok: true }.
+
+GET /api/auth/me: tells the frontend whether anyone is logged in right
+now, and if so, what their email is - used by nav.js to show "Log Out"
+and the current user's email in the navigation bar.
+
+GET /api/status: returns a true/false flag for every step of the form
+(personalSubmitted, employmentSubmitted, ... expensesSubmitted) based on
+whether that section of data.json is filled in yet. This is what powers
+both the navigation bar (which tabs are clickable) and the per-page
+"gate" (see gate.js) that blocks you from skipping ahead.
+
+GET /api/data: returns this user's entire filing record as one JSON
+object - used by pages that need to read earlier answers (e.g. the
+Documents page needs to know what Employment/Assets/Liabilities were
+already filled in).
+
+POST /api/personal, /api/employment, /api/income-calculations,
+/api/spouse-other-member, /api/assets, /api/liabilities,
+/api/questionnaire, /api/income, /api/expenses: one endpoint per form
+page. Each one (other than personal and income) first checks that the
+PREVIOUS step in the flow was already submitted, replying with a 409
+error if not - this is the server-side half of the step-by-step gating
+(the browser-side half is gate.js). If the check passes, it saves
+whatever JSON body was posted into that section of data.json and replies
+{ ok: true }. /api/income is deliberately NOT gated on the Questionnaire
+step, because two earlier pages (Income Calculations and Spouse & Other
+Member) need to be able to push computed numbers into the Income record
+before the user necessarily visits the Income page themselves.
+
+The big block of PDF-drawing functions (ensureSpace, writeSectionTitle,
+writeSubHeading, drawKeyValueTable, filteredEntries,
+writeKeyValueSection, writeCategorySection, writeEmploymentSection,
+writeAssetsSection, computeDebtTotals, writeLiabilitiesSection,
+writeExpensesSection, incomeCalcInstanceEntries, writeIncomeCalcPerson,
+writeIncomeCalculationsSection, writeSpouseOtherMemberSection,
+drawIncomeGrid, writeIncomeSection): these are all helper functions used
+only by the PDF export below. In short: ensureSpace checks if there's
+room left on the current PDF page and starts a new page if not;
+drawKeyValueTable draws a two-column table (label | value) with
+alternating background colours, wrapping text and growing rows as
+needed; filteredEntries takes a raw data object plus the label
+dictionary from field-labels.js and throws away any field that's empty,
+so the PDF never shows blank rows; the "write*Section" functions each
+handle one part of the form (Employment, Assets, Liabilities, Income
+Calculations, Spouse & Other Member, Expenses), looping over whatever
+entries exist and drawing a heading plus a table for each one;
+drawIncomeGrid specifically redraws the Income page as an actual 4-column
+grid (matching what's on screen) rather than a plain label/value list.
+
+GET /api/pdf: the actual PDF download endpoint. First checks that ALL
+nine sections have been submitted - if even one is missing, it replies
+with a 409 error listing what's still needed. If everything is there, it
+creates a new PDF document, streams it straight to the browser as a
+file download (Content-Disposition: attachment), and calls each of the
+write*Section functions above in order to fill it with a full write-up
+of everything the user entered, finishing with doc.end() to close the
+file off.
+
+Startup: at the very bottom, the server calls initSchema() (create the
+three Postgres tables if they don't exist yet) and only starts actually
+listening for web requests once that succeeds - if Postgres isn't
+running or the connection details are wrong, the server logs a clear
+error and exits immediately instead of limping along half-broken.
+
+--------------------------------------------------------------------------
+2.2 documents-router.js - handles uploaded documents
+--------------------------------------------------------------------------
+
+This is a separate mini-Express-app (a "Router") that server.js plugs in
+under the /api/documents path. It's kept in its own file specifically so
+it doesn't clash by name with the browser-side documents.js script that
+lives in the same folder.
+
+DOCS_ROOT: the folder where all uploaded documents get saved, e.g.
+".../HTML/uploads". Can be overridden with the DOCS_ROOT environment
+variable (useful for pointing it at a real network share drive later).
+
+sanitizeForPath(str): cleans up a string (like someone's last name) so
+it's safe to use as part of a folder or file name - strips out characters
+Windows doesn't allow in file names (\ / : * ? " < > |), trims extra
+spaces, and caps the length at 60 characters.
+
+sanitizeFilename(name): similar, but for the uploaded file's own name -
+strips out any folder path an attacker might sneak into a filename and
+removes the same unsafe characters.
+
+resolveFolderName(userId): figures out which folder on disk belongs to
+this user. First checks if they already have one recorded in the users
+table (folder_name column) - if so, reuses it, so the folder never
+changes even if someone edits their name later. Otherwise builds a
+candidate name from their Personal Info as "LastName_FirstName"; if
+another, DIFFERENT account already has that exact folder name, it tries
+"LastName_FirstName_2", then "_3", and so on until it finds one that's
+free - then saves that choice permanently against their account.
+
+ensureFolder middleware: runs before any file is actually saved. Calls
+resolveFolderName, creates that folder on disk if it doesn't exist yet,
+and remembers the full path on the request object so the next two steps
+can use it.
+
+multer storage config: "multer" is the library that actually receives
+uploaded files. Its "destination" is simply the folder ensureFolder just
+prepared; its "filename" takes the category the file was uploaded under
+(e.g. "Paystubs"), sanitizes it, and prefixes it onto the saved file name
+along with the current timestamp, so files never collide and you can
+tell at a glance what each one is just from its name on disk. Files are
+capped at 25MB each.
+
+POST / (mounted as POST /api/documents): runs ensureFolder, then multer's
+upload.array("files", 20) (accepts up to 20 files in one request), then
+for every file that was saved, inserts one row into the documents table
+recording who uploaded it, under what category, its original name, and
+its saved-on-disk name. Replies with the list of saved file names.
+
+GET / (mounted as GET /api/documents): returns every document this
+logged-in user has uploaded so far, newest first - used by the Documents
+page to show what's already been provided under each category.
+
+DELETE /:id (mounted as DELETE /api/documents/:id): looks up that
+document ID, but ONLY if it belongs to the current logged-in user (so
+nobody can delete someone else's file just by guessing an ID). Works out
+the exact file path, double-checks that path is genuinely still inside
+that user's own folder (a defensive check against something ever going
+wrong upstream and pointing outside the intended folder), deletes the
+file from disk, deletes the database row, and replies { ok: true }.
+
+--------------------------------------------------------------------------
+2.3 field-labels.js - the "field name" -> "human label" dictionary
+--------------------------------------------------------------------------
+
+This file exports nothing but data - no logic. It's a big collection of
+JavaScript objects mapping the internal field names used in the code
+(like "employerName" or "debtSecurityType") to the friendly English
+labels shown in the PDF (like "Employer Name" or "Type"). There's one
+such dictionary for each section of the form (Personal, Employment,
+Assets, Liabilities, Questionnaire, Income, Expenses, Income
+Calculations, Spouse & Other Member), plus a couple of shared lists
+(INCOME_ROWS, INCOME_COLUMNS, EXPENSE_SECTIONS) that describe the exact
+rows/columns of the Income and Expenses grids so the PDF can rebuild
+those same grids. This file is only ever require()'d by server.js -
+nothing in the browser touches it directly.
+
+--------------------------------------------------------------------------
+2.4 field-labels.browser.js - the same dictionary, for the browser
+--------------------------------------------------------------------------
+
+Identical content to field-labels.js, but written so it can be loaded
+with a plain <script> tag in a browser instead of Node's require(). It
+attaches everything onto window.FieldLabels. summary.js is the only page
+script that loads this file - it needs the same label dictionaries to
+render the on-screen Summary page in a human-readable way, mirroring
+exactly what the PDF shows.
+
+
+================================================================================
+3. THE DATABASE (Postgres)
+================================================================================
+
+Three tables, created automatically the first time the server starts
+(see initSchema() above):
+
+users
+  email           - the account's email address (the primary key - the
+                     unique way every other table refers to this user)
+  password_hash   - never the actual password, just its bcrypt hash
+  folder_name     - the document-upload folder name assigned to them
+                     (blank until their first document upload)
+  created_at      - when they signed up
+
+sessions
+  session_id      - the random ID stored in the browser's cookie
+  user_email      - which user this session belongs to
+  created_at      - when they logged in
+
+documents
+  id                  - auto-incrementing number identifying this upload
+  user_email          - who uploaded it
+  category            - which document type it was filed under (e.g.
+                         "Paystubs", "Property Valuation Document")
+  original_filename   - the file's name as it was on the uploader's own
+                         computer
+  stored_filename     - the actual (sanitized, timestamped) name it was
+                         saved as on the server's disk
+  uploaded_at         - when it was uploaded
+
+The bankruptcy filing answers themselves (Personal Info, Employment,
+Assets, etc.) are NOT in Postgres - they still live in data.json, one
+entry per user email. Only login/account data and document records were
+moved into the database.
+
+The database itself is a portable, no-install copy of PostgreSQL living
+in the pg/ folder (pg/extracted/pgsql = the actual program files, pg/data
+= the actual database files). It's started and stopped with pg/start.ps1
+and pg/stop.ps1 - it is NOT a Windows service, so after a reboot you need
+to run pg/start.ps1 again before starting the app itself with start.ps1.
+
+
+================================================================================
+4. SHARED FRONTEND FILES (used by almost every page)
+================================================================================
+
+--------------------------------------------------------------------------
+4.1 style.css - the shared look and feel
+--------------------------------------------------------------------------
+
+Sets the overall page background colour and font, styles the big blue
+page-title banner (h1), the light-blue boxed "form-wrapper" that most
+forms sit inside, form labels and inputs, the yellow "entry-card" boxes
+used for repeatable entries (an employer, a vehicle, a liability, etc.)
+with their header/title bar, and the green/red colouring used for
+"Saved" vs "Failed to save" messages after a submit.
+
+--------------------------------------------------------------------------
+4.2 nav.css - the navigation bar and the "blocked page" notice
+--------------------------------------------------------------------------
+
+Styles the dark blue bar of tabs across the top of every page (site-nav,
+nav-tab, including greyed-out styling for tabs you can't click yet), the
+small user-email label and "Log Out" button that sit at the end of that
+bar once you're logged in, and the pale yellow "Not available yet" box
+(gate-notice) shown when you try to visit a page out of order.
+
+--------------------------------------------------------------------------
+4.3 nav.js - builds the navigation bar
+--------------------------------------------------------------------------
+
+TABS: a plain list describing every tab in order - its label, which page
+it links to, and which /api/status flag has to be true before it's
+clickable (Personal Info is always clickable; everything else depends on
+the step before it).
+
+currentPage(): works out which page is currently open, by reading the
+last part of the browser's URL.
+
+render(status, authInfo): builds the actual <nav> element from scratch
+every time it's called - one link (or, if not yet unlocked, a plain
+greyed-out <span>) per tab, marking whichever one matches the current
+page as "active". If authInfo says someone is logged in, it also appends
+their email and a "Log Out" button; clicking Log Out calls
+/api/auth/logout and then sends the browser to login.html.
+
+refresh(): fetches /api/status and /api/auth/me at the same time,
+then calls render() with both results. This runs once when the page
+first loads, and again any time something dispatches a "nav:refresh"
+browser event (every page's submit handler does this after a successful
+save, so the nav bar immediately reflects the newly-unlocked tab without
+needing a full page reload).
+
+--------------------------------------------------------------------------
+4.4 gate.js - blocks a page if you've skipped ahead
+--------------------------------------------------------------------------
+
+Gate.enforce(requiredFlag, contentSelector, message, backHref): every
+page (except Personal Info, which has nothing before it, and Summary,
+which is meant to work regardless) calls this once when it loads. It
+fetches /api/status, and if the flag it was asked to check (e.g.
+"personalSubmitted") is true, it does nothing and lets the page carry on
+normally. If the flag is false (or the request fails), it hides the
+page's real content and replaces it with a yellow box saying "Not
+available yet", the given message, and a link back to whichever page
+needs to be completed first. This is the SECOND gate in the app (on top
+of the login gate in server.js) - it stops you jumping ahead in the
+FORM'S order even though you're already logged in.
+
+
+================================================================================
+5. LOGIN AND SIGNUP PAGES
+================================================================================
+
+--------------------------------------------------------------------------
+5.1 login.html / login.js
+--------------------------------------------------------------------------
+
+login.html: a small standalone page (no navigation bar, since you're not
+logged in yet) with an email field, a password field, a "Log In" button,
+a status message area, and a link to the Sign Up page. Uses style.css for
+the same look as the rest of the app.
+
+login.js: when the form is submitted, it stops the browser's normal form
+submission, reads the email and password, shows "Logging in..." while it
+posts them as JSON to /api/auth/login, and then either sends the browser
+to the home page ("/") on success, or shows the server's error message
+(e.g. "Invalid email or password.") in red without leaving the page.
+
+--------------------------------------------------------------------------
+5.2 signup.html / signup.js
+--------------------------------------------------------------------------
+
+signup.html: the same idea as login.html, but with an extra "Confirm
+Password" field, and a link back to the Log In page instead.
+
+signup.js: checks, before even talking to the server, that the password
+is at least 8 characters and matches the confirmation field, showing an
+immediate error if not. If those pass, it posts email/password to
+/api/auth/signup, and either lands on the home page (now logged in,
+since signing up logs you straight in) or shows whatever error the
+server sent back (e.g. "An account with this email already exists.").
+
+
+================================================================================
+6. THE FORM PAGES, IN ORDER
+================================================================================
+
+--------------------------------------------------------------------------
+6.1 index.html / index.js / style.css - PERSONAL INFO (step 1)
+--------------------------------------------------------------------------
+
+index.html: the very first page of the form. Fields for first/middle/last
+name, alias first/last name, date of birth, SIN number, sex, education,
+mobile number, email, address/city/province/postal code, marital status,
+marital status change date, number of dependents, spouse name, whether
+they receive the Child Tax Benefit, a text box for their reason for
+financial difficulty, and a read-only "Bankruptcy Info" box that mirrors
+the name/DOB fields automatically. Ends with a Submit button and a status
+message area. This page has no Gate.enforce call, because there's no
+earlier step to require.
+
+index.js: shows or hides the "Spouse Name" field depending on whether
+Marital Status is Married/Separated/Common-Law; shows or hides the
+"Child Tax Benefit" field depending on whether Number of Dependents is
+above zero; keeps the read-only "Bankruptcy Info" display in sync with
+the name/DOB fields as you type (both the on-screen text AND matching
+hidden form inputs, so those values get submitted too); and on submit,
+collects every field into one object and POSTs it to /api/personal,
+showing "Saved..." or "Failed to save" and telling the nav bar to
+refresh.
+
+--------------------------------------------------------------------------
+6.2 employment.html / employment.js / employment.css - EMPLOYMENT (step 2)
+--------------------------------------------------------------------------
+
+employment.html: six "Add ___ Info" buttons (Employment, Unemployment,
+Retired, Disabled, Self-Employed, Benefits) - the six different
+employment situations someone in the household might be in. Each button
+has a matching <template> (a piece of invisible HTML that gets cloned
+whenever you click "Add") describing that situation's specific fields
+(e.g. Employment asks for employer name/job title/type/date of joining;
+Self-Employed asks for business name/type/operations type/address/dates/
+employee count/ownership %/NAICS code). You can add as many of each as
+you like (e.g. two part-time jobs).
+
+employment.js: gated on personalSubmitted. Wires each "Add" button to
+clone its template into the page and gives every cloned card a working
+"x" remove button. On submit, it walks every currently-visible card in
+each of the six categories, reads every input/select inside it into a
+plain object, groups them by category into one big payload, and POSTs it
+to /api/employment.
+
+--------------------------------------------------------------------------
+6.3 income-calculations.html / income-calculations.js / .css - step 3
+--------------------------------------------------------------------------
+
+income-calculations.html: two sections - "Debtor Income Calculations"
+(auto-built from whatever was entered on the Employment page) and
+"Spouse Income Calculations" (only shown if Marital Status was Married
+or Common-Law, and freely add/removable by the user), plus a live
+"amounts that will be pushed to Income" summary box and a submit button.
+
+income-calculations.js - the most complex page script in the app. It
+builds five different kinds of "calculator cards":
+  - Employed: payment frequency + net income + a repeatable list of
+    deductions to add back (garnishments, RRSP, etc.), which together
+    compute a "Total Income" figure using a different formula depending
+    on whether they're paid weekly, biweekly, semi-monthly, or monthly.
+  - Unemployed: a small decision tree - are they on EI? If yes, just ask
+    the EI amount. If no, are they on financial assistance? If yes, ask
+    who's providing it. If no to both, are they on any other named
+    benefit? Only one branch of these questions is ever visible/asked at
+    a time.
+  - Retired: a repeatable list of "Type of Pension" + "Monthly Income"
+    rows, summed into a total.
+  - Disabled / Self-Employed / Benefits: each just a single
+    "Monthly Income" style field.
+On load, it fetches the Employment data already on file and builds one
+DEBTOR card per entry that was already submitted there (these cards
+aren't removable, since they correspond to real submitted employment
+records - only their calculator fields are editable). If the household
+is Married/Common-Law, it reveals the Spouse section, where the user can
+freely add and remove any of Employed/Unemployed/Retired/Benefits cards
+(no Disabled/Self-Employed for the spouse, matching what the buttons on
+the page offer). Every time anything on the page changes, it recomputes
+totals for both debtor and spouse and refreshes the live "pushed to
+Income" summary box.
+
+On submit, it does two things in sequence: first it POSTs the raw
+calculator data (every card's own fields) to /api/income-calculations for
+record-keeping; then it fetches whatever's currently on the Income page
+(so it doesn't erase manually-typed rows there), overlays the newly
+computed Employment Income / EI / Pension / Self-Employment / "Other"
+figures on top, recalculates every subtotal and the grand total, and
+POSTs that merged result to /api/income - meaning the Income page will
+already be pre-filled with these numbers the next time someone visits it.
+
+--------------------------------------------------------------------------
+6.4 spouse-other-member.html / .js / .css - step 4
+--------------------------------------------------------------------------
+
+spouse-other-member.html: asks how many adults and dependents are in the
+household (dependents is read-only, copied from Personal Info); if there
+are more adults than expected for the household type, reveals an "Other
+Adults in Household" section where you can add people with a description,
+whether they earn income, and how much; if married/common-law, asks
+whether the spouse earns income and how much; asks about child support
+and spousal support (amount fields only appear if "Yes" is picked).
+
+spouse-other-member.js: gated on incomeCalculationsSubmitted. Pre-fills
+the dependents count and marital status from Personal Info, and works
+out the "extra adults" threshold (more than 2 if married/common-law,
+more than 1 otherwise) to decide whether to reveal the Other Adults
+section. Wires up all the Yes/No conditional reveals. On submit, just
+like Income Calculations, it saves the raw answers to
+/api/spouse-other-member, then fetches the current Income record,
+overlays the spouse's income / child support / spousal support / other
+household members' income into the right cells, recalculates every
+subtotal and the grand total, and POSTs the merged result to /api/income.
+
+--------------------------------------------------------------------------
+6.5 assets.html / assets.js / assets.css - step 5
+--------------------------------------------------------------------------
+
+assets.html: five repeatable categories - Properties (type: House /
+Mobile Home / Trailer, each revealing a different set of fields plus
+some handling notes for whoever's reviewing the file), Vehicles (a type
+dropdown with sub-groups for regular vehicles vs. recreational ones, plus
+a live "At a Glance" summary card that mirrors year/make/model/VIN/
+mileage as you type them), Policies (RRSP / DPSP / RESP / Life Insurance
+/ Other, each with its own fields, plus a small notes panel to the side),
+Securities (Mutual Fund / Bonds / Crypto / Other), and Other Assets (a
+free-form description/value/loan/creditor). There's also a hidden
+"Bankruptcy Equity" box that only appears for certain cases (see below).
+
+assets.js: gated on spouseOtherMemberSubmitted. Wires up every "Add"
+button the same cloning pattern as Employment, plus the type dropdowns
+that swap which sub-fields are visible depending on what's picked, plus
+the Vehicle "At a Glance" live mirror. On load, it checks the Employment
+data already on file - if any Self-Employed entry has "Corporation" or
+"Incorporated" as its Operations Type, it reveals the Bankruptcy Equity
+box (extra fields relevant to a corporate debtor). On submit, it collects
+every visible card from all five categories, plus the Bankruptcy Equity
+fields if that box is showing, into one payload and POSTs it to
+/api/assets.
+
+--------------------------------------------------------------------------
+6.6 liabilities.html / liabilities.js / liabilities.css - step 6
+--------------------------------------------------------------------------
+
+liabilities.html: an "Add Liability" button producing repeatable cards
+with creditor name (a dropdown of common creditors, with an "Others"
+option that reveals a free-text field), liability detail
+(Personal/Business), ownership type, debt type (with an "Other" option
+revealing a description field), debt security type
+(Unsecured/Secured/Contingent, with "Secured" revealing a "Secured
+Against" field), and a debt amount. A floating panel at the side keeps
+running totals of Secured vs. Unsecured debt.
+
+liabilities.js: gated on assetsSubmitted. Wires the Add button and all
+three conditional field reveals (Others creditor, Other debt type,
+Secured debt). Recalculates the two floating totals live as any amount
+or security-type changes anywhere on the page. On submit, collects every
+liability card into a list and POSTs it to /api/liabilities.
+
+--------------------------------------------------------------------------
+6.7 questionnaire.html / questionnaire.js / questionnaire.css - step 7
+--------------------------------------------------------------------------
+
+questionnaire.html: four Yes/No questions (sold or transferred property
+in the last 5 years, had property seized/repossessed, expects large funds
+in the next 12 months, received gifts over $500 in the last 12 months),
+each revealing a "please describe in detail" text box only when answered
+"Yes".
+
+questionnaire.js: gated on liabilitiesSubmitted. Shows/hides each detail
+box based on which radio button is checked. On submit, collects every
+answered field (skipping anything hidden/unanswered) and POSTs it to
+/api/questionnaire.
+
+--------------------------------------------------------------------------
+6.8 income.html / income.js / income.css - step 8
+--------------------------------------------------------------------------
+
+income.html: a table with one row per income type (Employment Income,
+Pension/Annuities, Child Support, Spousal Support, Employment Insurance,
+Social Assistance, Self Employment Income, Rental Income, Universal
+Child Care, Child Tax Benefits, and an open "Other" row with its own
+description field) and one column each for Applicant, Spouse, and Other
+Household - plus a Sub Total row per column and a Total Combined Income
+row at the bottom.
+
+income.js: gated on questionnaireSubmitted. On load, pre-fills every
+cell from whatever's already saved (including anything pushed in
+automatically by the Income Calculations or Spouse & Other Member
+pages). Recalculates every subtotal and the grand total live as any cell
+changes. On submit, collects every cell plus the calculated subtotals/
+total and POSTs it to /api/income.
+
+--------------------------------------------------------------------------
+6.9 expenses.html / expenses.js / expenses.css - step 9
+--------------------------------------------------------------------------
+
+expenses.html: eight separate tables, one per expense category (Monthly
+Non-Discretionary Expenses, Housing, Personal, Medical, Living,
+Transportation, Insurance, Payments), each with its own fixed list of
+line items plus an "Add Other (Specify) Expense" button that appends a
+free-form description+amount row, and its own subtotal at the bottom. A
+floating panel shows the grand total of all expenses, the Income Total
+(pulled from the Income page), and a Surplus/Deficit figure that turns
+red or green depending on whether it's negative or positive.
+
+expenses.js: gated on incomeSubmitted. Wires every "Add Other" button.
+Recalculates every table's subtotal, the overall grand total, and the
+surplus/deficit live as anything changes anywhere on the page, and looks
+up the Income Total once when the page loads. On submit, collects every
+field, every "other" row, every subtotal, and the three summary figures,
+and POSTs the whole thing to /api/expenses.
+
+--------------------------------------------------------------------------
+6.10 documents.html / documents.js / documents.css - DOCUMENTS (step 10)
+--------------------------------------------------------------------------
+
+documents.html: just a page title, a short instruction, and one empty
+container that documents.js fills in - nothing is hard-coded here because
+which documents to ask for depends entirely on what was answered earlier
+in the form.
+
+documents.js: gated on expensesSubmitted (by this point Employment,
+Assets, Liabilities, and Expenses are all known, so it has everything it
+needs). Fetches both the whole filing record (/api/data) and the list of
+documents already uploaded (/api/documents), then works out which
+document "sections" to show:
+  - Identification & Banking: always shown - an Identification Document
+    slot (driver's licence, passport, etc.) and a combined VOID Cheque /
+    PAD Form / Banking Document slot (any of the three satisfies it, same
+    "pick whichever applies" pattern as the Self-Employed income slot).
+  - Income Documents: shown if any employment type was entered at all;
+    within it, Paystubs only if Employed, Bank Statements (with a "2
+    months minimum" note) only if Unemployed or Retired, Bank Statements
+    Showing Income only if Disabled, and three Self-Employed-only slots
+    (Uber/Business/Tax Returns, a 3-Month POI Sheet, Personal Bank
+    Statements) only if Self-Employed.
+  - Assets Documents: shown if a House, a Vehicle, a Security, or an
+    RRSP/RESP policy exists; Property Valuation only for a House,
+    Vehicle Registration + Valuation only if there's a Vehicle,
+    Investment/RRSP/RESP Valuation if there's a Security or an RRSP/RESP.
+  - Liabilities: shown, with a "can upload multiple" Debt Proof slot, if
+    any liability was entered.
+  - Non-Discretionary Expense Proof: shown if any of the non-discretionary
+    expense fields (or an "other" row under that section) has a value.
+  - Sending Money Overseas: not driven by any earlier answer - this page
+    asks its own Yes/No question, and only reveals a "Proof of Transfer"
+    upload slot if the answer is Yes (that choice is remembered in memory
+    so it doesn't reset every time you upload something in a different
+    section).
+Each visible slot is its own little card: a heading, a "not uploaded" /
+"[checkmark] N uploaded" status, any already-uploaded files listed with
+a remove ("x") button each, a file picker, and an Upload button. Choosing
+files and clicking Upload sends them as a multi-part form request to
+POST /api/documents (with the category name attached), and the whole page
+re-fetches and redraws itself afterwards so the new file(s) show up
+immediately. Clicking a file's "x" calls DELETE /api/documents/:id and
+redraws the same way.
+
+documents.css: styling only for this page - the category cards, the
+"fulfilled" green checkmark status text vs. the grey "not uploaded" text,
+the uploaded-file rows, and the overseas Yes/No toggle row.
+
+--------------------------------------------------------------------------
+6.11 summary.html / summary.js / summary.css - SUMMARY (last page)
+--------------------------------------------------------------------------
+
+summary.html: a "Download PDF" link (which just points straight at the
+/api/pdf endpoint on the server) followed by empty containers for every
+section of the form, which summary.js fills in.
+
+summary.js - has NO Gate.enforce call, unlike every other page; it's
+meant to show whatever exists, even if the filing is incomplete. On load,
+it fetches /api/data (the whole filing record) and, using the label
+dictionaries from field-labels.browser.js, renders every section in a
+read-only, easy-to-scan format: Personal Info as a plain label/value
+grid; Employment, Assets, Income Calculations, and Liabilities as
+one card per category with one sub-card per entry (e.g. "Entry 1",
+"Entry 2" for multiple properties or jobs); Liabilities and Expenses also
+get their computed totals shown (Secured/Unsecured debt totals; each
+expense section's subtotal, plus the overall All Expenses Total, Income
+Total, and Surplus/Deficit); the Income page rendered as its own
+label/value list using the same row/column labels as the on-screen grid.
+Anywhere a section has nothing in it, it just prints "No ___ details
+submitted yet." instead of an empty box. This page is essentially a
+browser-side mirror of exactly what the PDF export in server.js draws,
+just rendered as HTML instead of PDF graphics.
+
+summary.css: styling for this page's specific look - the info-grid
+label/value pairs, the sub-cards for repeated entries, and the
+total-box styling used for the debt/expense summary figures.
+
+
+================================================================================
+7. FILES THAT AREN'T PART OF THE RUNNING APP
+================================================================================
+
+Pwo_pwi.html - an empty (0-byte) file. Not referenced by anything, not
+loaded by the server in any special way; it's just sitting in the folder
+unused.
+
+pg/ - the portable PostgreSQL program files and database, plus start.ps1
+/ stop.ps1 to start and stop it. Not source code for the app itself.
+
+start.ps1 (project root) - a small convenience script that sets the four
+PGHOST/PGPORT/PGUSER/PGDATABASE environment variables and then runs
+"node server.js", so the app always connects to the right database
+without you having to remember to set those by hand every time.
+
+
+================================================================================
+END OF DOCUMENT
+================================================================================

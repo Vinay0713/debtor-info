@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Log In</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+  <h1>Log In</h1>
+
+  <form id="loginForm" class="form-wrapper">
+    <label>Email:
+      <input type="email" name="email" required autocomplete="email" />
+    </label>
+    <label>Password:
+      <input type="password" name="password" required autocomplete="current-password" />
+    </label>
+
+    <div class="submitRow">
+      <button type="submit" id="loginBtn">Log In</button>
+      <span id="submitStatus"></span>
+    </div>
+
+    <p class="hint">Don't have an account? <a href="signup.html">Sign up</a></p>
+  </form>
+
+  <script src="login.js"></script>
+</body>
+</html>
