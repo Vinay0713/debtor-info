@@ -1,13 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Submission Summary</title>
-  <link rel="stylesheet" type="text/css" href="nav.css">
-  <link rel="stylesheet" type="text/css" href="summary.css">
+<%- include('partials/head', { title: 'Submission Summary', css: ['summary.css'] }) %>
 </head>
 <body>
-  <div id="navPlaceholder"></div>
+<%- include('partials/nav') %>
 
   <h1>Submission Summary</h1>
 
@@ -23,10 +20,6 @@
       <div id="personalInfoGrid" class="info-grid"></div>
     </section>
 
-    <section id="employmentSections"></section>
-
-    <section id="incomeCalculationsSections"></section>
-
     <section class="entry-card">
       <div class="entry-header">
         <h3>Spouse &amp; Other Member Info</h3>
@@ -34,6 +27,10 @@
       <div id="somGrid" class="info-grid"></div>
       <div id="somOtherAdultsSections"></div>
     </section>
+
+    <section id="employmentSections"></section>
+
+    <section id="incomeCalculationsSections"></section>
 
     <section id="assetsSections"></section>
 
@@ -56,9 +53,6 @@
     <section id="expensesSections"></section>
   </div>
 
-  <script src="./nav.js"></script>
-  <script src="./gate.js"></script>
-  <script src="./field-labels.browser.js"></script>
-  <script src="./summary.js"></script>
+<%- include('partials/scripts', { pageScript: 'summary.js', gate: true, extraScripts: ['field-labels.browser.js'] }) %>
 </body>
 </html>

@@ -1,13 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Income Information</title>
-  <link rel="stylesheet" type="text/css" href="nav.css">
-  <link rel="stylesheet" type="text/css" href="employment.css">
+<%- include('partials/head', { title: 'Income Information', css: ['employment.css'] }) %>
 </head>
 <body>
-  <div id="navPlaceholder"></div>
+<%- include('partials/nav') %>
 
   <h1>Income Information</h1>
   <div id="pageContent" class="income-info">
@@ -171,9 +168,6 @@
   </div>
   </div>
 
-<script src="./nav.js"></script>
-<script src="./gate.js"></script>
-<script src="./employment.js"></script>
-
+<%- include('partials/scripts', { pageScript: 'employment.js', gate: true }) %>
 </body>
 </html>

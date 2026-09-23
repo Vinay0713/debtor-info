@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const allowed = await Gate.enforce(
         "expensesSubmitted",
         "#pageContent",
-        "Please submit Personal Info, Employment Info, Income Calculations, Spouse & Other Member Info, Assets Info, Liabilities Info, the Questionnaire, Income Info, and Expenses Info first.",
+        "Please submit Personal Info, Spouse & Other Member Info, Employment Info, Income Calculations, Assets Info, Liabilities Info, the Questionnaire, Income Info, and Expenses Info first.",
         "expenses.html"
     );
     if (!allowed) return;

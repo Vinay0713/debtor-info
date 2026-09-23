@@ -1,13 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Spouse & Other Member Info</title>
-  <link rel="stylesheet" type="text/css" href="nav.css">
-  <link rel="stylesheet" type="text/css" href="spouse-other-member.css">
+<%- include('partials/head', { title: 'Spouse & Other Member Info', css: ['spouse-other-member.css'] }) %>
 </head>
 <body>
-  <div id="navPlaceholder"></div>
+<%- include('partials/nav') %>
 
   <h1>Spouse &amp; Other Member Info</h1>
 
@@ -112,8 +109,6 @@
 
   </div>
 
-  <script src="./nav.js"></script>
-  <script src="./gate.js"></script>
-  <script src="./spouse-other-member.js"></script>
+<%- include('partials/scripts', { pageScript: 'spouse-other-member.js', gate: true }) %>
 </body>
 </html>

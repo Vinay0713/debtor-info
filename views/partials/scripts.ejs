@@ -1,0 +1,8 @@
+<script src="/nav.js"></script>
+<% if (locals.gate) { %>
+<script src="/gate.js"></script>
+<% } %>
+<% (locals.extraScripts || []).forEach(function (src) { %>
+<script src="/<%= src %>"></script>
+<% }); %>
+<script src="/<%= pageScript %>"></script>

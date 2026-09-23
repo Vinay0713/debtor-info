@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<%- include('partials/head', { title: 'Documents', css: ['style.css', 'documents.css'] }) %>
+</head>
+<body>
+<%- include('partials/nav') %>
+
+  <h1>Documents</h1>
+
+  <div id="pageContent" class="documents-page">
+    <p class="hint">Upload the documents that apply to this case. Categories below are based on what was entered on the earlier pages.</p>
+    <div id="categoriesContainer"></div>
+  </div>
+
+<%- include('partials/scripts', { pageScript: 'documents.js', gate: true }) %>
+</body>
+</html>

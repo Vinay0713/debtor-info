@@ -1,9 +1,9 @@
 document.addEventListener("DOMContentLoaded", async () => {
     const allowed = await Gate.enforce(
-        "spouseOtherMemberSubmitted",
+        "incomeCalculationsSubmitted",
         "#pageContent",
-        "Please submit Spouse & Other Member Info first.",
-        "spouse-other-member.html"
+        "Please submit Income Calculations first.",
+        "income-calculations.html"
     );
     if (!allowed) return;
 

@@ -1,13 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Assets</title>
-  <link rel="stylesheet" type="text/css" href="nav.css">
-  <link rel="stylesheet" type="text/css" href="assets.css">
+<%- include('partials/head', { title: 'Assets', css: ['assets.css'] }) %>
 </head>
 <body>
-  <div id="navPlaceholder"></div>
+<%- include('partials/nav') %>
 
   <h1>Assets</h1>
 
@@ -349,8 +346,6 @@
 
   </div>
 
-  <script src="./nav.js"></script>
-  <script src="./gate.js"></script>
-  <script src="./assets.js"></script>
+<%- include('partials/scripts', { pageScript: 'assets.js', gate: true }) %>
 </body>
 </html>

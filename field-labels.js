@@ -34,6 +34,7 @@ INCOME_COLUMNS.forEach(([colKey, colLabel]) => {
   INCOME_FIELD_LABELS[`subtotal_${colKey}`] = `Sub Total - ${colLabel}`;
 });
 INCOME_FIELD_LABELS.totalCombinedIncome = "Total Combined Income";
+INCOME_FIELD_LABELS.ctbAmount = "CTB Amount";
 
 const EXPENSE_SECTIONS = [
   {
@@ -157,6 +158,7 @@ const EXPENSE_SUMMARY_FIELD_LABELS = {
 
 module.exports = {
   PERSONAL_FIELD_LABELS: {
+    agentName: "Agent Name",
     firstName: "First Name",
     middleName: "Middle Name",
     lastName: "Last Name",

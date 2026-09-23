@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Income</title>
-  <link rel="stylesheet" type="text/css" href="nav.css">
-  <link rel="stylesheet" type="text/css" href="income.css">
+<%- include('partials/head', { title: 'Income', css: ['income.css'] }) %>
 </head>
 <body>
-  <div id="navPlaceholder"></div>
+<%- include('partials/nav') %>
 
   <h1>Income</h1>
 
   <div id="pageContent" class="income-page">
+
+  <div class="entry-card" id="ctbAmountDiv" style="display:none;">
+    <label>CTB Amount:
+      <input type="number" name="ctbAmount" id="ctbAmount" min="0" step="0.01" />
+    </label>
+  </div>
 
   <div class="table-wrap">
   <table class="income-table">
@@ -122,8 +125,6 @@
 
   </div>
 
-  <script src="./nav.js"></script>
-  <script src="./gate.js"></script>
-  <script src="./income.js"></script>
+<%- include('partials/scripts', { pageScript: 'income.js', gate: true }) %>
 </body>
 </html>

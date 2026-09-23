@@ -1,17 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Personal Info</title>
-  <link rel="stylesheet" type="text/css" href="nav.css">
-  <link rel="stylesheet" type="text/css" href="style.css">
+<%- include('partials/head', { title: 'Personal Info', css: ['style.css'] }) %>
 </head>
 <body>
-  <div id="navPlaceholder"></div>
+<%- include('partials/nav') %>
 
   <h1>Personal info</h1>
 
   <form id="personalForm" class="form-wrapper">
+
+  <div class="agentInfo">
+    <div id="agentName">
+    <label>Agent Name:
+      <input type="text" name="agentName" />
+    </label>
+    </div>
+  </div>
 
   <div class="name">
     <div id="firstName">
@@ -134,7 +139,7 @@
 
     <div id="ctbDiv" style="display:none;">
     <label>Receiving Child Tax Benefit:
-      <select name="childTaxBenefit">
+      <select name="childTaxBenefit" id="childTaxBenefit">
         <option value=""></option>
         <option value="Yes">Yes</option>
         <option value="No">No</option>
@@ -178,7 +183,6 @@
 
   </form>
 
- <script src="nav.js"></script>
- <script src="index.js"></script>
+<%- include('partials/scripts', { pageScript: 'index.js' }) %>
 </body>
 </html>
