@@ -23,8 +23,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     ];
 
     const pageContent = document.getElementById("pageContent");
-    const ctbAmountDiv = document.getElementById("ctbAmountDiv");
-    const ctbAmountInput = document.getElementById("ctbAmount");
 
     function num(value) {
         return parseFloat(value) || 0;
@@ -59,14 +57,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             const field = document.querySelector(`#pageContent [name="${key}"]`);
             if (field) field.value = value;
         });
-
-        // CTB Amount only applies if Personal Info says the applicant is
-        // receiving the Child Tax Benefit. Checked after the pre-fill above
-        // so a stale saved amount doesn't linger visible if that answer
-        // later changed to No.
-        const receivingCtb = Boolean(data.personal && data.personal.childTaxBenefit === "Yes");
-        ctbAmountDiv.style.display = receivingCtb ? "block" : "none";
-        if (!receivingCtb) ctbAmountInput.value = "";
     } catch (err) {
         // If the fetch fails, the form just starts blank.
     }

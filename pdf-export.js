@@ -406,10 +406,6 @@ function drawIncomeGrid(doc, income) {
     { bold: true, fill: "#234461", textColor: "#ffffff" }
   );
 
-  if (income && income.ctbAmount) {
-    drawRow(["CTB Amount", `$${income.ctbAmount}`, "", ""], { fill: "#e0ffff" });
-  }
-
   doc.moveDown(0.5);
 }
 
